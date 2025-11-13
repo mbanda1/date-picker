@@ -1,0 +1,49 @@
+{
+  "name": "@mbanda1/datepicker",
+  "version": "0.0.3",
+  "description": "My awesome date picker",
+  "author": "mbanda1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.tsx --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.tsx --format cjs,esm --dts --watch"
+  },
+  "keywords": [],
+  "packageManager": "pnpm@10.15.1",
+  "peerDependencies": {
+    "@chakra-ui/react": ">=1.0.3",
+    "react": ">=17.0.1",
+    "react-dom": ">=17.0.1"
+  },
+  "devDependencies": {
+    "@chakra-ui/react": "^1.0.3",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "date-fns": "2.19.0",
+    "framer-motion": "^6.5.1",
+    "react-hook-form": "7.51.3",
+    "@types/react": "^17.0.89",
+    "@types/react-dom": "^17.0.26",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "^17.0.2",
+      "react-dom": "^17.0.2",
+      "@types/react": "^17.0.89",
+      "@types/react-dom": "^17.0.26"
+    }
+  }
+}
