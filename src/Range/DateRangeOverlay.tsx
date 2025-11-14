@@ -33,6 +33,11 @@ type CalendarView = 'days' | 'months' | 'years';
 type SelectionPhase = 'start' | 'end';
 type SpecialView = 'left' | 'right' | null;
 type YearRange = { start: number; end: number };
+const CALENDAR_COLUMN_WIDTH = 250;
+const CALENDAR_COLUMN_WIDTH_PX = `${CALENDAR_COLUMN_WIDTH}px`;
+const CALENDAR_FLEX_VALUE = `0 0 ${CALENDAR_COLUMN_WIDTH_PX}` as const;
+const OVERLAY_WIDTH = CALENDAR_COLUMN_WIDTH * 2;
+const OVERLAY_WIDTH_PX = `${OVERLAY_WIDTH}px`;
 
 // Helper functions
 const normalizeDate = (
@@ -800,10 +805,19 @@ export const DateRangeOverlay = ({
   };
 
   return (
-    <Flex>
+    <Flex
+      width={OVERLAY_WIDTH_PX}
+      maxWidth={OVERLAY_WIDTH_PX}
+      minWidth={OVERLAY_WIDTH_PX}
+      justifyContent={activeSpecialView ? 'center' : 'stretch'}
+    >
       {activeSpecialView ? (
         // Show only one calendar's special view
-        <Box flex={1}>
+        <Box
+          flex={CALENDAR_FLEX_VALUE}
+          width={CALENDAR_COLUMN_WIDTH_PX}
+          minWidth={CALENDAR_COLUMN_WIDTH_PX}
+        >
           <CalendarHeader side={activeSpecialView} />
           {renderCalendarContent(activeSpecialView)}
         </Box>
@@ -811,13 +825,25 @@ export const DateRangeOverlay = ({
         // Show both calendars in normal view
         <>
           {/* Left Calendar */}
-          <Box flex={1} borderRight='1px solid' borderColor='gray.200' pt={4}>
+          <Box
+            flex={CALENDAR_FLEX_VALUE}
+            width={CALENDAR_COLUMN_WIDTH_PX}
+            minWidth={CALENDAR_COLUMN_WIDTH_PX}
+            borderRight='1px solid'
+            borderColor='gray.200'
+            pt={4}
+          >
             <CalendarHeader side='left' />
             {renderCalendarContent('left')}
           </Box>
 
           {/* Right Calendar */}
-          <Box flex={1} pt={4}>
+          <Box
+            flex={CALENDAR_FLEX_VALUE}
+            width={CALENDAR_COLUMN_WIDTH_PX}
+            minWidth={CALENDAR_COLUMN_WIDTH_PX}
+            pt={4}
+          >
             <CalendarHeader side='right' />
             {renderCalendarContent('right')}
           </Box>

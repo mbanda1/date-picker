@@ -256,7 +256,7 @@ export const DateRangePickerInput = ({
             {/* start */}
             <HStack>
               {showPresets && (
-                <Box w='105px' h='100%' pl={1}>
+                <Box w='110px' h='100%' pl={1}>
                   <DateRangePresets onSelectRange={handleDateChange} />
                 </Box>
               )}
