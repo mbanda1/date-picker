@@ -1,6 +1,6 @@
 # @mbanda1/datepicker
 
-Accessible Chakra UI date pickers for single dates and ranges, built with React, React Hook Form 7, and `date-fns`. Every component ships fully typed, themable, and ready to publish on npm.
+Accessible Chakra UI date pickers for single dates and ranges, built with React, React Hook Form 7, and `date-fns`. Every component ships fully typed and themable.
 
 ## Features
 - Chakra-first API that plays nicely with your design tokens.
@@ -186,19 +186,6 @@ Wraps `DatePickerInput` inside a Chakra `FormControl` and a `react-hook-form` `C
   )}
 />;
 ```
-
-## Theming & tokens
-
-The pickers are Chakra components, so they inherit your global tokens automatically. For finer control, you can import the exported `THEME` map and override it before rendering:
-
-```ts
-import { THEME } from '@mbanda1/datepicker';
-
-THEME.selectedBgColor = 'purple.500';
-THEME.dayTextColor = 'gray.700';
-```
-
-> `THEME` is a mutable object used by both single and range overlays; adjust it in a module that runs once (e.g., where you set up your Chakra provider).
 
 ## License
 

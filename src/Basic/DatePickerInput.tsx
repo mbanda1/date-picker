@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import {
   Box,
   HStack,
@@ -13,6 +13,19 @@ import { DateOverlay } from './DateOverlay';
 import { CalendarOutline, XCircleOutline } from '../components/icons';
 import { DatePickerInputProps } from '../types';
 
+const getRightElementWidth = (
+  size: DatePickerInputProps['size'],
+  hasClear: boolean,
+): string => {
+  if (size === 'sm') {
+    return hasClear ? '3.5rem' : '2.5rem';
+  }
+  if (size === 'lg') {
+    return hasClear ? '4.5rem' : '3.5rem';
+  }
+  return hasClear ? '4rem' : '3rem';
+};
+
 export const DatePickerInput = ({
   value,
   onChange,
@@ -25,20 +38,56 @@ export const DatePickerInput = ({
   isDisabled = false,
   isRequired = false,
   isInvalid = false,
-  size = 'md',
+  size: sizeProp = 'md',
   variant = 'outline',
   showClearIcon = true,
   ...rest
 }: DatePickerInputProps) => {
+  const size = sizeProp ?? 'md';
   // Input value and picker visibility
   const [inputValue, setInputValue] = useState<string>(
     value && isValid(value) ? format(value, dateFormat) : '',
   );
   const [isOpen, setIsOpen] = useState(false);
-
+  const [overlayWidth, setOverlayWidth] = useState<number | null>(null);
+  const shouldShowClear = Boolean(inputValue && !isDisabled && showClearIcon);
+  const iconBoxSize = size === 'sm' ? 3 : 4;
+  const iconSpacing = size === 'sm' ? 1 : 2;
+  const iconWrapperWidth = size === 'sm' ? '1.5rem' : '2rem';
+  const overlayWidthValue = overlayWidth === null ? '100%' : `${overlayWidth}px`;
+  const rightElementWidth = getRightElementWidth(size, shouldShowClear);
   // Refs for positioning and outside click detection
   const inputRef = useRef<HTMLInputElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const inputEl = inputRef.current;
+    if (!inputEl) {
+      return;
+    }
+
+    const updateWidth = () => {
+      setOverlayWidth(inputEl.offsetWidth);
+    };
+
+    updateWidth();
+
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(updateWidth);
+      resizeObserver.observe(inputEl);
+    } else if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateWidth);
+    }
+
+    return () => {
+      resizeObserver?.disconnect();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', updateWidth);
+      }
+    };
+  }, [size]);
 
   // Close the date picker when clicking outside
   useOutsideClick({
@@ -114,7 +163,7 @@ export const DatePickerInput = ({
   }, [isDisabled]);
 
   return (
-    <Box position='relative' width='100%'>
+    <Box position='relative'>
       <InputGroup>
         <Input
           ref={inputRef}
@@ -131,30 +180,38 @@ export const DatePickerInput = ({
           isReadOnly
         />
 
-        <InputRightElement width='4rem'>
-          <HStack justify='space-between' w='100%'>
-            {inputValue && !isDisabled && showClearIcon && (
+        <InputRightElement width={rightElementWidth}>
+          <HStack justify='flex-end' spacing={iconSpacing} align='center'>
+            {shouldShowClear && (
               <Box
+                width={iconWrapperWidth}
                 onClick={() => {
                   onChange?.(null);
                   clearInput?.();
                   setInputValue('');
                 }}
                 cursor='pointer'
+                display='flex'
+                alignItems='center'
+                justifyContent='center'
               >
                 <XCircleOutline
-                  boxSize={4}
+                  boxSize={iconBoxSize}
                   color='gray.500'
                   aria-label='Clear date'
                 />
               </Box>
             )}
             <Box
+              width={iconWrapperWidth}
               onClick={togglePicker}
               cursor={isDisabled ? 'not-allowed' : 'pointer'}
+              display='flex'
+              alignItems='center'
+              justifyContent='center'
             >
               <CalendarOutline
-                boxSize={4}
+                boxSize={iconBoxSize}
                 opacity={isDisabled ? 0.4 : 1}
                 color='green'
               />
@@ -167,10 +224,10 @@ export const DatePickerInput = ({
         <Box
           ref={popoverRef}
           position='absolute'
-          zIndex={10}
+          zIndex={1000}
           top='calc(100% + 8px)'
           left='0'
-          width='100%'
+          width={overlayWidthValue}
         >
           <DateOverlay
             value={value}

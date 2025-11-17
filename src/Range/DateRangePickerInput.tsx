@@ -15,7 +15,20 @@ import { format, isValid } from 'date-fns';
 import { DateRangeOverlay } from './DateRangeOverlay';
 import { CalendarOutline, XCircleOutline } from '../components/icons';
 import DateRangePresets from './DateRangePresets';
-import { DateRangePickerInputProps } from '../types';
+import { DatePickerInputProps, DateRangePickerInputProps } from '../types';
+
+const getRightElementWidth = (
+  size: DatePickerInputProps['size'],
+  hasClear: boolean,
+): string => {
+  if (size === 'sm') {
+    return hasClear ? '3.5rem' : '2.5rem';
+  }
+  if (size === 'lg') {
+    return hasClear ? '4.5rem' : '3.5rem';
+  }
+  return hasClear ? '4rem' : '3rem';
+};
 
 export const DateRangePickerInput = ({
   startDate,
@@ -58,6 +71,13 @@ export const DateRangePickerInput = ({
   const [localEndDate, setLocalEndDate] = useState<Date | null>(
     endDate || null,
   );
+
+  const shouldShowClear = Boolean(inputValue && !isDisabled && showClearIcon);
+  const iconBoxSize = size === 'sm' ? 3 : 4;
+  const iconSpacing = size === 'sm' ? 1 : 2;
+  const iconWrapperWidth = size === 'sm' ? '1.5rem' : '2rem';
+  // const overlayWidthValue = overlayWidth === null ? '100%' : `${overlayWidth}px`;
+  const rightElementWidth = getRightElementWidth(size, shouldShowClear);
 
   // Refs for positioning and outside click detection
   const inputRef = useRef<HTMLInputElement>(null);
@@ -220,19 +240,32 @@ export const DateRangePickerInput = ({
           isReadOnly
         />
 
-        <InputRightElement width='4rem'>
-          <HStack justify='space-between' w='100%'>
-            {inputValue && !isDisabled && showClearIcon && (
-              <Box onClick={handleClear} cursor='pointer'>
-                <XCircleOutline boxSize={4} color='gray.500' />
+      <InputRightElement width={rightElementWidth}>
+          <HStack justify='flex-end' spacing={iconSpacing} align='center'>
+            {shouldShowClear && (
+            // {inputValue && !isDisabled && showClearIcon && (
+              <Box                 
+              width={iconWrapperWidth}
+            onClick={handleClear} cursor='pointer'
+            display='flex'
+            alignItems='center'
+            justifyContent='center'>
+            
+            <XCircleOutline                   
+            boxSize={iconBoxSize}
+             color='gray.500' />
               </Box>
             )}
             <Box
+              width={iconWrapperWidth}
               onClick={togglePicker}
               cursor={isDisabled ? 'not-allowed' : 'pointer'}
+              display='flex'
+              alignItems='center'
+              justifyContent='center'
             >
               <CalendarOutline
-                boxSize={4}
+                boxSize={iconBoxSize}
                 opacity={isDisabled ? 0.4 : 1}
                 color='green'
               />
