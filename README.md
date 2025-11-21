@@ -51,11 +51,13 @@ export function EventDateField() {
 }
 ```
 
+![DatePicker Example](https://drive.google.com/file/d/1n9apjcWBkJ9UwQqOonbOlWT1erl6rbMi/view?usp=sharing)
+
+
 ### React Hook Form 7 integration
 
 ```tsx
 import { useForm } from 'react-hook-form';
-import { DatePickerInputHookForm7 } from '@mbanda1/datepicker';
 
 type FormValues = { eventDate: Date | null };
 
@@ -68,18 +70,18 @@ export function BookingForm() {
 
   return (
     <form onSubmit={handleSubmit(console.log)}>
-      <DatePickerInputHookForm7
-        name='eventDate'
-        control={control}
-        label='Event date'
-        helperText='Pick any weekday between 9 AM and 4:30 PM'
-        error={errors.eventDate}
-        isRequired
-        showTimeSelect
-        timeInterval={120}
-        minTime='09:00'
-        maxTime='16:30'
+      
+        <Controller
+    control={control}
+    name='date'
+    render={({ field }) => (
+      <DatePickerInput
+        {...field}
+        placeholder='Select a date'
+        dateFormat='MMMM d, yyyy'
       />
+    )}
+  />
     </form>
   );
 }
@@ -98,12 +100,12 @@ export function RangeFilter() {
   });
 
   return (
-               <DateRangePickerInput
+      <DateRangePickerInput
       startDate={range.startDate}
       endDate={range.endDate}
       onChange={setRange}
-                      dateFormat='yyyy-MM-dd'
-                      placeholder='Select period'
+      dateFormat='yyyy-MM-dd'
+      placeholder='Select period'
       showPresets
       clearInput={() => setRange({ startDate: null, endDate: null })}
     />
@@ -111,7 +113,11 @@ export function RangeFilter() {
 }
 ```
 
-> Need the range picker in React Hook Form? Wrap `DateRangePickerInput` in a `Controller` and forward `value`/`onChange` manually (see “Range picker + RHF” below).
+
+> Need the range picker in React Hook Form? Wrap `DateRangePickerInput` in a `Controller` and forward `value`/`onChange` manually (see "Range picker + RHF" below).
+
+
+![Date Range Example](https://drive.google.com/file/d/1zwmvssj7IbV94OXK0dw5B5Qo2FBlO5Bp/view?usp=sharing)
 
 ## API Reference
 
@@ -125,7 +131,7 @@ export function RangeFilter() {
 | `minDate` / `maxDate` | `Date` | `undefined` | Bounds selection (inclusive, normalized to start/end of day). |
 | `placeholder` | `string` | `'Select date'` | Input placeholder. |
 | `dateFormat` | `string` | `'yyyy-MM-dd'` | `date-fns` compatible format string. |
-| `showTodayButton` | `boolean` | `true` | Toggles the “Today” shortcut. |
+| `showTodayButton` | `boolean` | `true` | Toggles the "Today" shortcut. |
 | `showTimeSelect` | `boolean` | `false` | Enables the time list beneath the calendar. |
 | `timeInterval` | `number` | `30` | Minutes between time options. |
 | `minTime` / `maxTime` | `string (HH:mm)` | `'00:00'` / `'23:59'` | Bounds the selectable time window. |
@@ -134,23 +140,6 @@ export function RangeFilter() {
 | `variant` | `'outline' \| 'filled' \| 'flushed' \| 'unstyled'` | `'outline'` | Chakra input variant. |
 | `showClearIcon` | `boolean` | `true` | Display the inline clear control. |
 | `clearInput` | `() => void` | `undefined` | Notified when the clear icon is clicked. |
-
-### `DatePickerInputHookForm7`
-
-Wraps `DatePickerInput` inside a Chakra `FormControl` and a `react-hook-form` `Controller`.
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `name` | `FieldPath<T>` | **required** | Form field name. |
-| `control` | `Control<T>` | **required** | RHF control instance. |
-| `rules` | `RegisterOptions<T>` | `undefined` | Validation rules. |
-| `label` | `string` | `undefined` | Optional Chakra `FormLabel`. |
-| `helperText` | `string` | `undefined` | Renders under the field when no error. |
-| `error` | `FieldError` | `undefined` | Drives `isInvalid` and `FormErrorMessage`. |
-| `showError` | `boolean` | `true` | Hide the error message while retaining state. |
-| `isRequired` | `boolean` | `false` | Mirrors Chakra prop + adds asterisk. |
-| `placeholder` | `string` | `'dd/mm/yyyy'` | Overrides the input placeholder. |
-| `...rest` | `DatePickerInput` props | — | Passed down after removing `value`/`onChange`. |
 
 ### `DateRangePickerInput`
 
@@ -190,4 +179,3 @@ Wraps `DatePickerInput` inside a Chakra `FormControl` and a `react-hook-form` `C
 ## License
 
 MIT © mbanda1
-

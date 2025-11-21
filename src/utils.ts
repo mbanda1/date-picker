@@ -7,5 +7,5 @@ export const THEME = {
   inRangeBgColor: colors['hue-green'][50],
   todayBorderColor: 'blue',
   dayTextColor: colors.overlay,
-  disabledTextColor: colors['hue-grey'][300],
+  disabledTextColor: colors['hue-grey'][600],
 };

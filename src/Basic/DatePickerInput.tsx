@@ -230,13 +230,13 @@ export const DatePickerInput = ({
           width={overlayWidthValue}
         >
           <DateOverlay
+             {...rest}
             value={value}
             onChange={handleDateChange}
             defaultValue={defaultValue}
             minDate={minDate}
             maxDate={maxDate}
             isDisabled={isDisabled}
-            {...rest}
           />
         </Box>
       )}

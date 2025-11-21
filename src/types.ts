@@ -49,23 +49,6 @@ export interface DateRangePickerInputProps extends DateRangePickerProps {
   isLoading?: boolean;
 }
 
-export interface DatePickerInputHookForm7Props<
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> extends Omit<DatePickerInputProps, 'value' | 'onChange'> {
-  name: TName;
-  control: Control<TFieldValues>;
-  label?: string;
-  helperText?: string;
-  rules?: RegisterOptions<TFieldValues, TName>;
-  error?: FieldError;
-  showError?: boolean;
-  showTimeSelect?: boolean;
-  timeInterval?: number;
-  minTime?: string; // Format: "HH:mm"
-  maxTime?: string; // Format: "HH:mm"
-  showClearIcon?: boolean;
-}
 export interface DateRangePickerInputHookFormProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,

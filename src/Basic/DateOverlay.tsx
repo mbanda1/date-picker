@@ -326,6 +326,7 @@ export const DateOverlay = ({
                 variant='unstyled'
                 onClick={() => handleDateSelect(day)}
                 display='flex'
+                flexDirection='column'
                 alignItems='center'
                 justifyContent='center'
                 p={2}
@@ -337,22 +338,36 @@ export const DateOverlay = ({
                     ? THEME.disabledTextColor
                     : THEME.dayTextColor
                 }
-                border={
-                  isToday && !isSelected ? '1px solid' : '1px solid transparent'
-                }
-                borderColor={
-                  isToday && !isSelected
-                    ? THEME.todayBorderColor
-                    : 'transparent'
-                }
+                outline='none'
                 opacity={isCurrentMonth ? 1 : 0.5}
                 _hover={
                   !isSelected && !isDateDisabled ? { bg: THEME.hoverColor } : {}
                 }
+                _focus={{
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none',
+                }}
+                _active={{
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none',
+                }}
                 isDisabled={isDateDisabled}
                 cursor={isDateDisabled ? 'not-allowed' : 'pointer'}
+                position='relative'
               >
                 {format(day, 'd')}
+                {isToday && !isSelected && (
+                  <Box
+                    position='absolute'
+                    bottom='4px'
+                    width='4px'
+                    height='4px'
+                    borderRadius='full'
+                    bg={THEME.todayBorderColor}
+                  />
+                )}
               </Button>
             );
           })}
@@ -544,9 +559,6 @@ export const DateOverlay = ({
   // Time selection component
   const TimeSelector = useCallback(() => {
     const timeOptions = generateTimeOptions();
-    const formattedDate = value
-      ? format(new Date(value), 'EEEE, MMMM, yyyy')
-      : format(selectedDate, 'EEEE, MMMM, yyyy');
 
     return (
       <Box
@@ -557,8 +569,8 @@ export const DateOverlay = ({
         pl={4}
         ref={timeListRef}
       >
-        <Text fontWeight='medium' mb={2}>
-          {formattedDate}
+        <Text fontWeight='bold' mb={2}>
+          Time
         </Text>
         <Stack spacing={1}>
           {timeOptions.map(time => (

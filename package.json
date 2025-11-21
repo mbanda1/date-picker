@@ -1,7 +1,7 @@
 {
   "name": "@mbanda1/date-picker",
   "version": "0.2.1",
-  "description": "My awesome date picker",
+  "description": "Date picker build with react",
   "author": "mbanda1",
   "license": "MIT",
   "main": "dist/index.js",
