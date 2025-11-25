@@ -51,8 +51,6 @@ export function EventDateField() {
 }
 ```
 
-![DatePicker Example](https://drive.google.com/file/d/1n9apjcWBkJ9UwQqOonbOlWT1erl6rbMi/view?usp=sharing)
-
 
 ### React Hook Form 7 integration
 
@@ -117,7 +115,6 @@ export function RangeFilter() {
 > Need the range picker in React Hook Form? Wrap `DateRangePickerInput` in a `Controller` and forward `value`/`onChange` manually (see "Range picker + RHF" below).
 
 
-![Date Range Example](https://drive.google.com/file/d/1zwmvssj7IbV94OXK0dw5B5Qo2FBlO5Bp/view?usp=sharing)
 
 ## API Reference
 

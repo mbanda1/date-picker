@@ -1,6 +1,10 @@
 {
   "name": "@mbanda1/date-picker",
   "version": "0.3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbanda1/date-picker.git"
+  },
   "description": "Date picker build with react",
   "author": "mbanda1",
   "license": "MIT",
@@ -19,19 +23,20 @@
   "peerDependencies": {
     "@chakra-ui/react": ">=1.0.3",
     "react": ">=17.0.1",
-    "react-dom": ">=17.0.1"
+    "react-dom": ">=17.0.1",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "framer-motion": "^4.0.0 || ^5.0.0 || ^6.0.0"
+
+  },
+  "dependencies": {
+    "date-fns": "2.19.0",
+    "react-hook-form": "7.51.3"
   },
   "devDependencies": {
     "@chakra-ui/react": "^1.0.3",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "date-fns": "2.19.0",
-    "framer-motion": "^6.5.1",
-    "react-hook-form": "7.51.3",
     "@types/react": "^17.0.89",
     "@types/react-dom": "^17.0.26",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "tsup": "^8.5.1",
     "typescript": "~5.9.3"
   },
