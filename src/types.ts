@@ -1,11 +1,3 @@
-import {
-  type Control,
-  type FieldValues,
-  type FieldError,
-  FieldPath,
-  RegisterOptions,
-} from 'react-hook-form';
-
 export interface DatePickerProps {
   value?: Date | null;
   onChange?: (date: Date | null) => void;
@@ -49,25 +41,6 @@ export interface DateRangePickerInputProps extends DateRangePickerProps {
   isLoading?: boolean;
 }
 
-export interface DateRangePickerInputHookFormProps<
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> extends Omit<
-    DateRangePickerInputProps,
-    'startDate' | 'endDate' | 'onChange'
-  > {
-  name: TName;
-  control: Control<TFieldValues>;
-  label?: string;
-  helperText?: string;
-  error?: FieldError;
-  showError?: boolean;
-  rules?: RegisterOptions<TFieldValues, TName>;
-  isRequired?: boolean;
-  showPresets?: boolean;
-  showClearIcon?: boolean;
-}
-
 export interface DateRangePickerProps {
   startDate?: Date | null;
   endDate?: Date | null;
@@ -104,18 +77,4 @@ export interface TimeSelectorInputProps {
   interval?: number; // Time interval in minutes
   startTime?: Date; // Start time of the day
   endTime?: Date; // End time of the day
-}
-export interface TimeSelectorHookForm7Props<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> extends Omit<
-    TimeSelectorInputProps,
-    'onChange' | 'onBlur' | 'name' | 'value'
-  > {
-  name: TName;
-  control: Control<TFieldValues>;
-  label?: string;
-  helperText?: string;
-  rules?: RegisterOptions<TFieldValues, TName>;
-  isRequired?: boolean;
 }
