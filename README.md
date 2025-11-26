@@ -26,7 +26,10 @@ Peer dependencies:
 
 ## Quick Start
 
-### Basic controlled picker
+### Basic date picker
+
+![Single date picker screenshot showing date and time selection](./src/screens/single-picker.png)
+
 
 ```tsx
 import { useState } from 'react';
@@ -87,6 +90,9 @@ export function BookingForm() {
 
 ### Date range picker
 
+
+![Date range picker screenshot](./src/screens/range-screen.png)
+
 ```tsx
 import { useState } from 'react';
 import { DateRangePickerInput } from '@mbanda1/datepicker';
@@ -110,6 +116,7 @@ export function RangeFilter() {
   );
 }
 ```
+
 
 
 > Need the range picker in React Hook Form? Wrap `DateRangePickerInput` in a `Controller` and forward `value`/`onChange` manually (see "Range picker + RHF" below).
