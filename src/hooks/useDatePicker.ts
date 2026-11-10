@@ -188,6 +188,7 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     setReference: popover.setReference,
     setFloating: popover.setFloating,
     popoverStyle: popover.style,
+    onPopoverKeyDown: popover.onKeyDown,
     dialogLabel: base.labels.dialog,
     view: state.view,
   });

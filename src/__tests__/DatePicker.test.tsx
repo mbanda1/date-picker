@@ -184,6 +184,18 @@ describe('DatePicker', () => {
     expect(onBlur).toHaveBeenCalled();
   });
 
+  it('keeps Tab inside the popover', async () => {
+    const { user, input } = setup();
+    await user.click(input);
+    const today = screen.getByRole('button', { name: 'Today' });
+    const prev = screen.getByRole('button', { name: 'Previous month' });
+    today.focus();
+    await user.tab();
+    expect(document.activeElement).toBe(prev);
+    await user.tab({ shift: true });
+    expect(document.activeElement).toBe(today);
+  });
+
   it('localises names and week start', async () => {
     const { user, input } = setup({ locale: 'fr-FR' });
     await user.click(input);

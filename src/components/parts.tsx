@@ -104,6 +104,7 @@ export const TimeList = ({ api }: { api: DatePickerApi }) => {
     const selected = list?.querySelector<HTMLElement>('[data-selected]');
     if (list && selected) {
       list.scrollTop = selected.offsetTop - list.clientHeight / 2 + selected.offsetHeight / 2;
+      list.scrollLeft = selected.offsetLeft - list.clientWidth / 2 + selected.offsetWidth / 2;
     }
   }, [api.selectedTime]);
 

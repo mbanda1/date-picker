@@ -1,0 +1,632 @@
+/*
+ * @mbanda1/date-picker default styles.
+ *
+ * Theme by setting any --dp-* variable on :root, an ancestor, or the
+ * className / popoverClassName you pass (the popover renders in <body>).
+ * Dark values apply under .dark or [data-theme="dark"] on an ancestor.
+ * Every rule uses :where() so your own selectors always win.
+ */
+
+:where(.dp-root, .dp-popover, .dp-backdrop) {
+  --_font: var(--dp-font, inherit);
+  --_font-size: var(--dp-font-size, 0.875rem);
+  --_radius: var(--dp-radius, 8px);
+  --_day-radius: var(--dp-day-radius, 8px);
+  --_cell: var(--dp-cell-size, 2.5rem);
+  --_field-height: var(--dp-field-height, 2.5rem);
+  --_z: var(--dp-z-index, 1000);
+
+  --_bg: var(--dp-bg, #ffffff);
+  --_fg: var(--dp-fg, #363a40);
+  --_heading: var(--dp-heading, #003049);
+  --_muted: var(--dp-muted, #536171);
+  --_disabled: var(--dp-disabled, #91969c);
+  --_border: var(--dp-border, #e4e5e7);
+  --_field-border: var(--dp-field-border, #787c82);
+  --_hover: var(--dp-hover, #f4f5f6);
+  --_accent: var(--dp-accent, #387e1b);
+  --_accent-hover: var(--dp-accent-hover, #236609);
+  --_accent-fg: var(--dp-accent-fg, #ffffff);
+  --_range: var(--dp-range, #d6f1ca);
+  --_range-preview: var(--dp-range-preview, #f1fdeb);
+  --_today: var(--dp-today, #0d6ae3);
+  --_focus: var(--dp-focus, #0d6ae3);
+  --_invalid: var(--dp-invalid, #c52516);
+  --_shadow: var(--dp-shadow, 0 10px 30px rgb(21 40 62 / 0.16), 0 2px 6px rgb(21 40 62 / 0.08));
+  --_backdrop: var(--dp-backdrop, rgb(21 40 62 / 0.45));
+}
+
+:where(.dark, [data-theme='dark']) :where(.dp-root, .dp-popover, .dp-backdrop) {
+  --_bg: var(--dp-bg, #1b1f24);
+  --_fg: var(--dp-fg, #e6e8eb);
+  --_heading: var(--dp-heading, #f2f4f5);
+  --_muted: var(--dp-muted, #9aa3ad);
+  --_disabled: var(--dp-disabled, #5c6670);
+  --_border: var(--dp-border, #2e343b);
+  --_field-border: var(--dp-field-border, #6b7580);
+  --_hover: var(--dp-hover, #262b31);
+  --_accent: var(--dp-accent, #7cc35b);
+  --_accent-hover: var(--dp-accent-hover, #92d173);
+  --_accent-fg: var(--dp-accent-fg, #0e2e01);
+  --_range: var(--dp-range, #23361a);
+  --_range-preview: var(--dp-range-preview, #1e2a18);
+  --_today: var(--dp-today, #78c3fb);
+  --_focus: var(--dp-focus, #78c3fb);
+  --_invalid: var(--dp-invalid, #f27a6e);
+  --_shadow: var(--dp-shadow, 0 10px 30px rgb(0 0 0 / 0.5));
+  --_backdrop: var(--dp-backdrop, rgb(0 0 0 / 0.6));
+}
+
+:where(.dp-root, .dp-popover) {
+  box-sizing: border-box;
+  font-family: var(--_font);
+  font-size: var(--_font-size);
+  line-height: 1.25;
+  color: var(--_fg);
+}
+
+:where(.dp-root, .dp-popover) :where(*, *::before, *::after) {
+  box-sizing: inherit;
+}
+
+:where(.dp-root, .dp-popover) :where(button) {
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.dp-root, .dp-popover) :where(button:disabled, button[aria-disabled='true']) {
+  cursor: not-allowed;
+}
+
+:where(.dp-root, .dp-popover) :where(button:focus-visible) {
+  outline: 2px solid var(--_focus);
+  outline-offset: -2px;
+}
+
+:where(.dp-root, .dp-popover) :where(svg) {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* Field */
+
+:where(.dp-root) {
+  position: relative;
+  display: block;
+}
+
+:where(.dp-field) {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: var(--_field-height);
+  padding-inline-end: 4px;
+  border: 1px solid var(--_field-border);
+  border-radius: var(--_radius);
+  background: var(--_bg);
+  transition: border-color 120ms, box-shadow 120ms;
+}
+
+:where(.dp-field:focus-within, .dp-field[data-open]) {
+  border-color: var(--_focus);
+  box-shadow: 0 0 0 1px var(--_focus);
+}
+
+:where(.dp-root[data-invalid] .dp-field) {
+  border-color: var(--_invalid);
+}
+
+:where(.dp-root[data-invalid] .dp-field:focus-within) {
+  box-shadow: 0 0 0 1px var(--_invalid);
+}
+
+:where(.dp-field[data-disabled]) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+:where(.dp-input) {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0.75rem;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+:where(.dp-input:focus) {
+  outline: none;
+}
+
+:where(.dp-input::placeholder) {
+  color: var(--_muted);
+  opacity: 1;
+}
+
+:where(.dp-input:disabled) {
+  cursor: not-allowed;
+}
+
+:where(.dp-icon-button) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: calc(var(--_radius) - 2px);
+  color: var(--_muted);
+}
+
+:where(.dp-icon-button[hidden]) {
+  display: none;
+}
+
+:where(.dp-trigger) {
+  color: var(--_accent);
+}
+
+/* Popover and sheet */
+
+:where(.dp-popover) {
+  z-index: var(--_z);
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  overflow: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--_border);
+  border-radius: calc(var(--_radius) + 4px);
+  background: var(--_bg);
+  box-shadow: var(--_shadow);
+  overscroll-behavior: contain;
+}
+
+:where(.dp-popover[data-layout='sheet']) {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  inset-inline: 0;
+  bottom: 0;
+  width: auto;
+  max-width: none;
+  max-height: min(90dvh, 40rem);
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  border-width: 1px 0 0;
+  border-radius: 1rem 1rem 0 0;
+  --_cell: var(--dp-cell-size, 2.75rem);
+}
+
+:where(.dp-backdrop) {
+  position: fixed;
+  inset: 0;
+  z-index: var(--_z);
+  background: var(--_backdrop);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(.dp-popover[data-layout='popover']) {
+    animation: dp-pop 120ms ease-out;
+  }
+  :where(.dp-popover[data-layout='sheet']) {
+    animation: dp-sheet 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  :where(.dp-backdrop) {
+    animation: dp-fade 200ms ease-out;
+  }
+}
+
+@keyframes dp-pop {
+  from { opacity: 0; translate: 0 -4px; }
+}
+
+@keyframes dp-sheet {
+  from { translate: 0 100%; }
+}
+
+@keyframes dp-fade {
+  from { opacity: 0; }
+}
+
+:where(.dp-body) {
+  display: flex;
+  gap: 0.75rem;
+}
+
+:where(.dp-popover[data-layout='sheet'] .dp-body) {
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  margin-inline: -1rem;
+  padding-inline: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Calendar */
+
+:where(.dp-calendar) {
+  display: flex;
+  gap: 1.25rem;
+}
+
+:where(.dp-panel) {
+  width: calc(var(--_cell) * 7);
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-calendar, .dp-panel) {
+  width: 100%;
+}
+
+:where(.dp-header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+:where(.dp-nav, .dp-nav-spacer) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--_radius);
+  color: var(--_heading);
+}
+
+:where(.dp-nav:disabled) {
+  opacity: 0.35;
+}
+
+:where(.dp-nav:dir(rtl) svg) {
+  transform: scaleX(-1);
+}
+
+:where(.dp-title) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--_radius);
+  font-weight: 600;
+  color: var(--_heading);
+}
+
+:where(.dp-title svg) {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--_muted);
+}
+
+:where(.dp-grid) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:where(.dp-row) {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+:where(.dp-weekday) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--_muted);
+}
+
+:where(.dp-cell) {
+  display: flex;
+  height: var(--_cell);
+}
+
+:where(.dp-cell[data-in-range]:not([data-outside-month])) {
+  background: var(--_range);
+}
+
+:where(.dp-cell[data-preview]:not([data-outside-month])) {
+  background: var(--_range-preview);
+}
+
+:where(.dp-cell[data-range-start], .dp-cell[data-in-range]:first-child) {
+  border-start-start-radius: var(--_day-radius);
+  border-end-start-radius: var(--_day-radius);
+}
+
+:where(.dp-cell[data-range-end], .dp-cell[data-in-range]:last-child) {
+  border-start-end-radius: var(--_day-radius);
+  border-end-end-radius: var(--_day-radius);
+}
+
+:where(.dp-day) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--_day-radius);
+  font-variant-numeric: tabular-nums;
+}
+
+:where(.dp-day[data-selected]) {
+  background: var(--_accent);
+  color: var(--_accent-fg);
+  font-weight: 600;
+}
+
+:where(.dp-day[data-preview]:is([data-range-start], [data-range-end]):not([data-selected])) {
+  box-shadow: inset 0 0 0 2px var(--_accent);
+}
+
+:where(.dp-day[data-today])::after {
+  content: '';
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--_today);
+  transform: translateX(-50%);
+}
+
+:where(.dp-day[data-today][data-selected])::after {
+  background: currentColor;
+}
+
+:where(.dp-day[data-disabled]) {
+  color: var(--_disabled);
+}
+
+:where(.dp-day[data-unavailable]) {
+  text-decoration: line-through;
+}
+
+/* Month and year views */
+
+:where(.dp-view-grid) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+:where(.dp-view-cell) {
+  min-height: 2.5rem;
+  padding: 0.25rem;
+  border-radius: var(--_radius);
+}
+
+:where(.dp-view-cell[data-current]) {
+  box-shadow: inset 0 0 0 1px var(--_today);
+}
+
+:where(.dp-view-cell[data-selected]) {
+  background: var(--_accent);
+  color: var(--_accent-fg);
+  font-weight: 600;
+}
+
+:where(.dp-view-cell[data-disabled]) {
+  color: var(--_disabled);
+}
+
+/* Time list */
+
+:where(.dp-time) {
+  display: flex;
+  flex-direction: column;
+  min-width: 6.5rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--_border);
+}
+
+:where(.dp-time-heading) {
+  display: flex;
+  align-items: center;
+  height: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--_heading);
+}
+
+:where(.dp-time-list) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: calc(var(--_cell) * 6 + 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+:where(.dp-time-option) {
+  flex: none;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--_radius);
+  text-align: start;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+:where(.dp-time-option[data-selected]) {
+  background: var(--_accent);
+  color: var(--_accent-fg);
+  font-weight: 600;
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-time) {
+  padding: 0.75rem 0 0;
+  border-inline-start: 0;
+  border-top: 1px solid var(--_border);
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-time-list) {
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: none;
+  padding-bottom: 0.25rem;
+}
+
+/* Presets */
+
+:where(.dp-presets) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 8rem;
+  padding-inline-end: 0.75rem;
+  border-inline-end: 1px solid var(--_border);
+}
+
+:where(.dp-preset) {
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--_radius);
+  text-align: start;
+  white-space: nowrap;
+}
+
+:where(.dp-preset[data-active]) {
+  background: var(--_accent);
+  color: var(--_accent-fg);
+  font-weight: 600;
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-presets) {
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-inline: -1rem;
+  padding: 0 1rem 0.75rem;
+  overflow-x: auto;
+  border-inline-end: 0;
+  border-bottom: 1px solid var(--_border);
+  scrollbar-width: none;
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-preset) {
+  flex: none;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--_border);
+  border-radius: 999px;
+}
+
+/* Footer */
+
+:where(.dp-footer) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--_border);
+}
+
+:where(.dp-summary) {
+  color: var(--_muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.dp-actions) {
+  display: flex;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+
+:where(.dp-button) {
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--_border);
+  border-radius: var(--_radius);
+  font-weight: 500;
+  color: var(--_heading);
+}
+
+:where(.dp-button:disabled) {
+  opacity: 0.45;
+}
+
+:where(.dp-button-primary) {
+  border-color: var(--_accent);
+  background: var(--_accent);
+  color: var(--_accent-fg);
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-footer) {
+  flex: none;
+  flex-wrap: wrap;
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-summary) {
+  flex-basis: 100%;
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-actions) {
+  flex: 1;
+}
+
+:where(.dp-popover[data-layout='sheet']) :where(.dp-actions .dp-button, .dp-today) {
+  flex: 1;
+  min-height: 2.75rem;
+}
+
+/* Hover only on devices that can hover, so taps don't leave sticky highlights */
+
+@media (hover: hover) {
+  :where(
+      .dp-icon-button:not(:disabled):hover,
+      .dp-nav:not(:disabled):hover,
+      .dp-title:not(:disabled):hover,
+      .dp-view-cell:not([aria-disabled]):hover,
+      .dp-time-option:not(:disabled):hover,
+      .dp-preset:not(:disabled):hover,
+      .dp-button:not(:disabled):hover
+    ) {
+    background: var(--_hover);
+  }
+  :where(.dp-day:not([aria-disabled]):not([data-selected]):not([data-range-start]):not([data-range-end]):hover) {
+    background: var(--_hover);
+  }
+  :where(.dp-cell[data-in-range] .dp-day:not([aria-disabled]):not([data-selected]):hover) {
+    background: color-mix(in srgb, var(--_accent) 18%, transparent);
+  }
+  :where(
+      .dp-view-cell[data-selected]:hover,
+      .dp-time-option[data-selected]:not(:disabled):hover,
+      .dp-preset[data-active]:not(:disabled):hover,
+      .dp-button-primary:not(:disabled):hover
+    ) {
+    background: var(--_accent-hover);
+  }
+}
+
+@media (forced-colors: active) {
+  :where(.dp-day[data-selected], .dp-day[data-range-start], .dp-day[data-range-end], .dp-view-cell[data-selected], .dp-time-option[data-selected], .dp-preset[data-active]) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  :where(.dp-cell[data-in-range]) {
+    background: Highlight;
+  }
+}

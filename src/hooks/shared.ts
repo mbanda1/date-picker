@@ -90,6 +90,7 @@ interface FieldPropsOptions {
   setReference: (el: HTMLElement | null) => void;
   setFloating: (el: HTMLElement | null) => void;
   popoverStyle: CSSProperties | undefined;
+  onPopoverKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
   dialogLabel: string;
   view: string;
 }
@@ -148,6 +149,8 @@ export const buildFieldProps = (o: FieldPropsOptions) => {
           e.preventDefault();
           e.stopPropagation();
           o.close('escape');
+        } else {
+          o.onPopoverKeyDown(e);
         }
       },
     }),

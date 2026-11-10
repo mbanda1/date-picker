@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { CSSProperties, MutableRefObject } from 'react';
+import type { CSSProperties, KeyboardEvent, MutableRefObject } from 'react';
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/react-dom';
 import type { Placement } from '@floating-ui/react-dom';
 import { useMediaQuery } from './utils';
@@ -24,7 +24,29 @@ export interface PickerPopover {
   floatingRef: MutableRefObject<HTMLElement | null>;
   /** Positioning styles; undefined in the sheet layout, where CSS places the popover. */
   style: CSSProperties | undefined;
+  /** Keeps Tab and Shift+Tab inside the popover. */
+  onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
 }
+
+const TABBABLE = 'button, input, select, textarea, a[href], [tabindex]';
+
+const getTabbables = (root: HTMLElement) =>
+  Array.from(root.querySelectorAll<HTMLElement>(TABBABLE)).filter(
+    el => el.tabIndex >= 0 && !el.hasAttribute('disabled') && !el.closest('[hidden]'),
+  );
+
+/** Locks page scroll behind the sheet, keeping the scrollbar gap so content doesn't shift. */
+const lockScroll = () => {
+  const html = document.documentElement;
+  const previous = { overflow: html.style.overflow, paddingRight: html.style.paddingRight };
+  const gap = window.innerWidth - html.clientWidth;
+  html.style.overflow = 'hidden';
+  if (gap > 0) html.style.paddingRight = `${gap}px`;
+  return () => {
+    html.style.overflow = previous.overflow;
+    html.style.paddingRight = previous.paddingRight;
+  };
+};
 
 export const usePickerPopover = ({
   open,
@@ -68,7 +90,29 @@ export const usePickerPopover = ({
     return () => document.removeEventListener('pointerdown', onPointerDown, true);
   }, [open, refs]);
 
+  useEffect(() => {
+    if (open && isSheet) return lockScroll();
+  }, [open, isSheet]);
+
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    const root = refs.floating.current;
+    if (event.key !== 'Tab' || !root) return;
+    const items = getTabbables(root);
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || !root.contains(active))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (active === last || !root.contains(active))) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   return {
+    onKeyDown,
     setReference: refs.setReference,
     setFloating: refs.setFloating,
     floatingRef: refs.floating,

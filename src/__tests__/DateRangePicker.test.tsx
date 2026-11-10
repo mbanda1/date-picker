@@ -116,9 +116,11 @@ describe('DateRangePicker', () => {
     expect(dialog()!.getAttribute('aria-modal')).toBe('true');
     expect(document.querySelector('.dp-backdrop')).not.toBeNull();
     expect(titles()).toEqual(['March 2025']);
+    expect(document.documentElement.style.overflow).toBe('hidden');
 
     await user.pointer({ keys: '[MouseLeft]', target: document.querySelector('.dp-backdrop')! });
     expect(dialog()).toBeNull();
+    expect(document.documentElement.style.overflow).toBe('');
   });
 
   it('posts an ISO interval through a hidden input', () => {

@@ -1,3 +1,4 @@
+import { copyFile } from 'node:fs/promises';
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
@@ -8,4 +9,5 @@ export default defineConfig({
   sourcemap: true,
   target: 'es2020',
   banner: { js: "'use client';" },
+  onSuccess: () => copyFile('src/styles.css', 'dist/styles.css'),
 });

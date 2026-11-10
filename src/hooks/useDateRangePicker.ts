@@ -192,6 +192,7 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
     setReference: popover.setReference,
     setFloating: popover.setFloating,
     popoverStyle: popover.style,
+    onPopoverKeyDown: popover.onKeyDown,
     dialogLabel: base.labels.dialog,
     view: state.view,
   });
