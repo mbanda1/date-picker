@@ -230,7 +230,7 @@ export const transition = (
   switch (event.type) {
     case 'SET_VALUE': {
       const selected = isValidDate(event.value) ? event.value : null;
-      if (selected === state.selected) return state;
+      if (selected?.getTime() === state.selected?.getTime()) return state;
       const next = { ...state, selected };
       return selected && !state.open ? jumpTo(next, selected, config, bounds) : next;
     }

@@ -2,6 +2,7 @@ export * from './types';
 export {
   YEAR_PAGE_SIZE,
   clampDate,
+  fromDateKey,
   getBounds,
   getYearPageStart,
   isDayDisabled,
@@ -10,6 +11,7 @@ export {
   isValidDate,
   isYearDisabled,
   parseTime,
+  toDateKey,
   withTime,
 } from './dates';
 export {
@@ -24,6 +26,7 @@ export { getDayCells, getMonthCells, getMonthGrid, getYearCells, isRangeSelectab
 export { getGridKeyEvent, type GridKeyInput } from './keyboard';
 export {
   DEFAULT_LOCALE,
+  createFormatters,
   formatDayNumber,
   formatFullDate,
   formatMonthYear,
@@ -32,6 +35,7 @@ export {
   getMonthNames,
   getWeekStartsOn,
   getWeekdayNames,
+  type Formatters,
   type WeekdayName,
 } from './locale';
 export { getTimeOptions, toTimeValue, type TimeOption, type TimeOptionsConfig } from './time';

@@ -1,46 +1,73 @@
 {
   "name": "@mbanda1/date-picker",
   "version": "0.3.2",
+  "description": "Headless-first, accessible React date and date-range pickers",
   "repository": {
     "type": "git",
     "url": "https://github.com/mbanda1/date-picker.git"
   },
-  "description": "Date picker build with react",
   "author": "mbanda1",
   "license": "MIT",
+  "sideEffects": false,
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./headless": {
+      "import": {
+        "types": "./dist/headless.d.mts",
+        "default": "./dist/headless.mjs"
+      },
+      "require": {
+        "types": "./dist/headless.d.ts",
+        "default": "./dist/headless.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --clean",
-    "dev": "tsup src/index.tsx --format cjs,esm --dts --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "packageManager": "pnpm@10.15.1",
   "peerDependencies": {
-    "@chakra-ui/react": ">=1.0.3",
-    "@emotion/react": "^11.0.0",
-    "@emotion/styled": "^11.0.0",
     "date-fns": "^3.0.0 || ^4.0.0",
-    "framer-motion": "^4.0.0 || ^5.0.0 || ^6.0.0",
-    "react": ">=17.0.1",
-    "react-dom": ">=17.0.1"
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
   },
   "devDependencies": {
-    "@chakra-ui/react": "^1.0.3",
-    "@types/react": "^17.0.89",
-    "@types/react-dom": "^17.0.26",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.9",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "date-fns": "^4.4.0",
+    "jsdom": "^31.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "tsup": "^8.5.1",
     "typescript": "~5.9.3",
     "vitest": "^5.1.0"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@floating-ui/react-dom": "^2.1.9"
   }
 }

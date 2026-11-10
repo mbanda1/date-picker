@@ -64,6 +64,31 @@ export const formatDayNumber = (date: Date, locale: string = DEFAULT_LOCALE) =>
 export const formatFullDate = (date: Date, locale: string = DEFAULT_LOCALE) =>
   new Intl.DateTimeFormat(locale, { dateStyle: 'full' }).format(date);
 
+export interface Formatters {
+  locale: string;
+  day: (date: Date) => string;
+  fullDate: (date: Date) => string;
+  monthYear: (date: Date) => string;
+  year: (date: Date) => string;
+  monthNames: string[];
+}
+
+/** Builds the Intl formatters once per locale; reuse them across renders. */
+export const createFormatters = (locale: string = DEFAULT_LOCALE): Formatters => {
+  const day = new Intl.DateTimeFormat(locale, { day: 'numeric' });
+  const fullDate = new Intl.DateTimeFormat(locale, { dateStyle: 'full' });
+  const monthYear = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
+  const year = new Intl.DateTimeFormat(locale, { year: 'numeric' });
+  return {
+    locale,
+    day: d => day.format(d),
+    fullDate: d => fullDate.format(d),
+    monthYear: d => monthYear.format(d),
+    year: d => year.format(d),
+    monthNames: getMonthNames(locale),
+  };
+};
+
 export const formatTimeLabel = (
   time: string,
   locale: string = DEFAULT_LOCALE,

@@ -91,6 +91,19 @@ export const revealMonth = (visibleMonth: Date, date: Date, numberOfMonths: numb
   return visibleMonth;
 };
 
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/** Local calendar day as "yyyy-MM-dd". */
+export const toDateKey = (date: Date) =>
+  `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+
+export const fromDateKey = (key: string): Date | null => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(key);
+  if (!match) return null;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return toDateKey(date) === key ? date : null;
+};
+
 export const parseTime = (time: string): { hours: number; minutes: number } | null => {
   const match = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
   if (!match) return null;
