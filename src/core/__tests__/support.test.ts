@@ -17,6 +17,12 @@ describe('locale', () => {
     expect(getWeekdayNames('en-US', 1)[0]).toEqual({ short: 'Mon', long: 'Monday' });
   });
 
+  it('falls back to narrow names when a locale has long short names', () => {
+    const names = getWeekdayNames('ar-EG', 6);
+    expect(names.every(n => n.short.length <= 4)).toBe(true);
+    expect(names[0].long).not.toBe(names[0].short);
+  });
+
   it('localises month names and times', () => {
     expect(getMonthNames('fr-FR')[0]).toBe('janvier');
     expect(formatTimeLabel('13:30', 'en-US')).toMatch(/^1:30\sPM$/u);

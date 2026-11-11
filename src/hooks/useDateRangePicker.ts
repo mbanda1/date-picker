@@ -48,7 +48,7 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
     separator = ' - ',
     dateFormat,
     sheetBreakpoint = 640,
-    dir = 'ltr',
+    dir,
     name,
     onOpenChange,
   } = props;
@@ -195,6 +195,7 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
     onPopoverKeyDown: popover.onKeyDown,
     dialogLabel: base.labels.dialog,
     view: state.view,
+    dir,
   });
 
   const hasValue = Boolean(value.start || value.end);

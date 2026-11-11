@@ -196,6 +196,14 @@ describe('DatePicker', () => {
     expect(document.activeElement).toBe(today);
   });
 
+  it('keeps RTL on the portalled popover and flips horizontal arrows', async () => {
+    const { user, input } = setup({ dir: 'rtl', defaultValue: new Date(2025, 2, 10) });
+    await user.click(input);
+    expect(dialog()!.getAttribute('dir')).toBe('rtl');
+    await user.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toBe(day('Tuesday, March 11, 2025'));
+  });
+
   it('localises names and week start', async () => {
     const { user, input } = setup({ locale: 'fr-FR' });
     await user.click(input);

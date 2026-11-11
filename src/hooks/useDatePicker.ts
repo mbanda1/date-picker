@@ -46,7 +46,7 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     closeOnSelect = true,
     dateFormat,
     sheetBreakpoint = 640,
-    dir = 'ltr',
+    dir,
     name,
     onOpenChange,
   } = props;
@@ -191,6 +191,7 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     onPopoverKeyDown: popover.onKeyDown,
     dialogLabel: base.labels.dialog,
     view: state.view,
+    dir,
   });
 
   return {

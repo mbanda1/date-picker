@@ -87,7 +87,7 @@ interface UseCalendarOptions {
   close: (reason: DismissReason) => void;
   formatters: Formatters;
   labels: PickerLabels;
-  dir: 'ltr' | 'rtl';
+  dir?: 'ltr' | 'rtl';
   floatingRef: MutableRefObject<HTMLElement | null>;
   fixedWeeks?: boolean;
 }
@@ -247,7 +247,8 @@ export const useCalendar = ({
           if (config.mode === 'range') send({ type: 'HOVER_DAY', date: null });
         },
         onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => {
-          const event = getGridKeyEvent({ key: e.key, shiftKey: e.shiftKey }, state, { rtl: dir === 'rtl' });
+          const rtl = dir ? dir === 'rtl' : getComputedStyle(e.currentTarget).direction === 'rtl';
+          const event = getGridKeyEvent({ key: e.key, shiftKey: e.shiftKey }, state, { rtl });
           if (!event) return;
           e.preventDefault();
           if (event.type === 'SELECT_DAY') {

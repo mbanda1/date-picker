@@ -31,6 +31,7 @@ export interface BasePickerProps {
   sheetBreakpoint?: number | null;
   /** Always render six weeks so the calendar height doesn't jump between months. */
   fixedWeeks?: boolean;
+  /** Text direction. Defaults to the direction inherited from the page. */
   dir?: 'ltr' | 'rtl';
   id?: string;
   onOpenChange?: (open: boolean) => void;
@@ -93,6 +94,7 @@ interface FieldPropsOptions {
   onPopoverKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
   dialogLabel: string;
   view: string;
+  dir?: 'ltr' | 'rtl';
 }
 
 /** Prop getters shared by both pickers for the field, trigger and popover. */
@@ -138,6 +140,7 @@ export const buildFieldProps = (o: FieldPropsOptions) => {
     getDialogProps: (): DivProps & { ref: (el: HTMLElement | null) => void } => ({
       ref: o.setFloating,
       id: dialogId,
+      dir: o.dir,
       role: 'dialog',
       'aria-label': o.dialogLabel,
       'aria-modal': o.isSheet ? true : undefined,

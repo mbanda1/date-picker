@@ -29,18 +29,30 @@ export interface WeekdayName {
   long: string;
 }
 
+const MAX_SHORT_WEEKDAY = 4;
+
+/**
+ * Weekday names in display order. "auto" uses the short form unless the locale's
+ * short names are longer than four characters (e.g. Arabic), then the narrow form.
+ */
 export const getWeekdayNames = (
   locale: string = DEFAULT_LOCALE,
   weekStartsOn: WeekDay = 0,
-  width: 'short' | 'narrow' = 'short',
+  width: 'short' | 'narrow' | 'auto' = 'auto',
 ): WeekdayName[] => {
-  const short = new Intl.DateTimeFormat(locale, { weekday: width });
-  const long = new Intl.DateTimeFormat(locale, { weekday: 'long' });
-  return Array.from({ length: 7 }, (_, i) => {
+  const days = Array.from({ length: 7 }, (_, i) => {
     const day = new Date(REFERENCE_SUNDAY);
     day.setDate(REFERENCE_SUNDAY.getDate() + ((weekStartsOn + i) % 7));
-    return { short: short.format(day), long: long.format(day) };
+    return day;
   });
+  const long = new Intl.DateTimeFormat(locale, { weekday: 'long' });
+  const format = (w: 'short' | 'narrow') => {
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: w });
+    return days.map(day => fmt.format(day));
+  };
+  let short = format(width === 'narrow' ? 'narrow' : 'short');
+  if (width === 'auto' && short.some(name => name.length > MAX_SHORT_WEEKDAY)) short = format('narrow');
+  return days.map((day, i) => ({ short: short[i], long: long.format(day) }));
 };
 
 export const getMonthNames = (

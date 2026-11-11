@@ -126,6 +126,10 @@ Pass `name` to render a hidden input with an ISO value: `2025-03-20` (or `2025-0
 
 Both entry points already include `'use client'`, so you can render the components from a Server Component. The calendar only renders after the user opens it, so hydration is stable. If you show "today" in server-rendered output, pass `now={…}` so the server and the browser agree on the date.
 
+Avoid creating `Date` values on the server and passing them to a picker as `value`, `defaultValue`, `minDate` or `maxDate`. The server formats them in its own timezone and the browser in the user's, which can shift the day and cause a hydration mismatch. Pass ISO date strings instead, and turn them into `Date`s in a client component (for example with `parseISO` from date-fns).
+
+[examples/nextjs](./examples/nextjs) is a working App Router app that covers each of these cases, including a Server Action form.
+
 ## Mobile
 
 Below 640px wide (configurable with `sheetBreakpoint`, or `null` to turn it off), the picker opens as a bottom sheet:
@@ -340,10 +344,14 @@ Behaviour changes:
 
 ```bash
 pnpm install
-pnpm test        # vitest: core logic + jsdom component tests
+pnpm test           # vitest: core logic + jsdom component tests
 pnpm typecheck
-pnpm build       # dist/: index, headless, styles.css
+pnpm build          # dist/: index, headless, styles.css
+pnpm example:dev    # Next.js playground at http://localhost:3000
+pnpm example:smoke  # production build of the example + end-to-end checks in headless Chrome
 ```
+
+`example:smoke` uses the published entry points (`dist`, the `exports` map and `styles.css`), so it checks exactly what consumers install. It needs Chrome or Chromium; set `CHROME_PATH` if Chrome isn't in a standard location. It fails on any broken flow and on any console error or warning, including hydration warnings. Screenshots go to `examples/nextjs/.smoke/`.
 
 ## License
 

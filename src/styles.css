@@ -253,6 +253,10 @@
   overscroll-behavior: contain;
 }
 
+:where(.dp-popover[data-layout='sheet'] .dp-body > *) {
+  flex: none;
+}
+
 /* Calendar */
 
 :where(.dp-calendar) {

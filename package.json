@@ -45,7 +45,9 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "example:dev": "pnpm build && pnpm --filter date-picker-example-nextjs dev",
+    "example:smoke": "pnpm build && pnpm --filter date-picker-example-nextjs build && pnpm --filter date-picker-example-nextjs smoke"
   },
   "keywords": [],
   "packageManager": "pnpm@10.15.1",
