@@ -256,6 +256,31 @@ try {
     await key('Escape', 'Escape', 27);
   });
 
+  await check('props playground drives both pickers', async () => {
+    await navigate(`${BASE}/playground`);
+    await realClick('#pg-picker');
+    await waitFor(`document.querySelector('[role=dialog]')`, 'dialog');
+    await realClick('[role=dialog] .dp-today');
+    await waitFor(`!document.querySelector('[role=dialog]')`, 'dialog closed');
+    const value = await evaluate(`document.querySelector('.pg-value').textContent`);
+    if (value.includes('null')) throw new Error(`output "${value}"`);
+
+    await realClick('input[name=pg-mode][value=range]');
+    await realClick('#pg-presets');
+    const code = await evaluate(`document.querySelector('.pg-preview pre').textContent`);
+    if (!code.startsWith('<DateRangePicker') || !code.includes('presets')) throw new Error(`snippet "${code}"`);
+    await realClick('#pg-picker');
+    await waitFor(`document.querySelectorAll('[role=dialog] [role=grid]').length === 2`, 'two months');
+    await waitFor(`document.querySelector('[role=dialog] .dp-preset')`, 'presets');
+    await screenshot('desktop-playground');
+    await key('Escape', 'Escape', 27);
+
+    await realClick('#pg-format');
+    await send('Input.insertText', { text: 'j' });
+    await waitFor(`document.querySelector('#pg-format-error')`, 'format error');
+    if (!(await evaluate(`Boolean(document.querySelector('#pg-picker'))`))) throw new Error('picker unmounted');
+  });
+
   await check('phone width uses the bottom sheet and locks scroll', async () => {
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
     await navigate(BASE);

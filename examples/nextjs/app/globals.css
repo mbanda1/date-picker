@@ -245,3 +245,114 @@ code {
   inset: auto 0 0;
   border-radius: 16px 16px 0 0;
 }
+
+/* Props playground */
+.pg-main {
+  max-width: 1120px;
+}
+
+.pg-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.pg-layout section {
+  margin-top: 24px;
+}
+
+.pg-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pg-controls h2,
+.pg-controls h3 {
+  margin: 0;
+}
+
+.pg-controls h3 {
+  padding-top: 12px;
+  border-top: 1px solid var(--page-border);
+  font-size: 1rem;
+}
+
+.pg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pg-field label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+}
+
+.pg-field input,
+.pg-field select {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--page-border);
+  border-radius: 8px;
+  background: var(--page-bg);
+  color: inherit;
+  font: inherit;
+}
+
+.pg-field input[aria-invalid] {
+  border-color: #c52516;
+}
+
+.pg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pg-checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+.pg-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.pg-segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pg-segmented legend {
+  margin-bottom: 4px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.pg-value {
+  display: block;
+  margin-top: 12px;
+  white-space: pre-line;
+}
+
+.pg-preview .code {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .pg-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}

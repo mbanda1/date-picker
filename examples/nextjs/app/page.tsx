@@ -18,7 +18,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
       <header className='page-header'>
         <div>
           <h1>@mbanda1/date-picker</h1>
-          <p className='muted'>Playground and smoke test for the Next.js App Router.</p>
+          <p className='muted'>
+            Playground and smoke test for the Next.js App Router. <a href='/playground'>Try every prop live</a>
+          </p>
         </div>
         <ThemeToggle />
       </header>
