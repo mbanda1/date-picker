@@ -119,7 +119,7 @@ export const getYearCells = (state: PickerState, config: PickerConfig): YearCell
 };
 
 /** True when the range is complete and every day in it is selectable. */
-export const isRangeSelectable = (state: PickerState, config: PickerConfig): boolean => {
+export const isRangeSelectable = (state: Pick<PickerState, 'range'>, config: PickerConfig): boolean => {
   const { start, end } = state.range;
   if (!start || !end) return false;
   const bounds = getBounds(config);

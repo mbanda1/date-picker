@@ -248,7 +248,13 @@ export function TailwindDatePicker(props: { value: Date | null; onChange: (d: Da
 
 Below `sheetBreakpoint` (640px by default), `getDialogProps()` returns no positioning `style`, sets `data-layout="sheet"` and `aria-modal`, and the hook locks page scrolling while the picker is open. Style that state as a bottom sheet, for example with `data-[layout=sheet]:fixed data-[layout=sheet]:inset-x-0 data-[layout=sheet]:bottom-0`, or pass `sheetBreakpoint={null}` to always get a positioned popover. `picker.isSheet` tells you which layout is active.
 
-The same entry point exports the framework-free core (`createInitialState`, `transition`, `getDayCells`, `getTimeOptions`, `DEFAULT_RANGE_PRESETS`, …). It's plain TypeScript with no React, for teams building on another framework.
+The framework-free core (`createInitialState`, `transition`, `getDayCells`, `getTimeOptions`, `DEFAULT_RANGE_PRESETS`, …) has its own entry point, `@mbanda1/date-picker/core`. It's plain TypeScript that depends only on `date-fns`, so it works with other frameworks and in React Server Components:
+
+```ts
+import { DEFAULT_RANGE_PRESETS, getTimeOptions } from '@mbanda1/date-picker/core';
+```
+
+`/headless` re-exports the same functions for convenience, but that entry imports React and is marked `'use client'`.
 
 ## Keyboard
 
@@ -369,7 +375,7 @@ Behaviour changes:
 pnpm install
 pnpm test           # vitest: core logic + jsdom component tests
 pnpm typecheck
-pnpm build          # dist/: index, headless, styles.css
+pnpm build          # dist/: index, headless, core, styles.css
 pnpm example:dev    # Next.js examples at http://localhost:3000, props playground at /playground
 pnpm example:smoke  # production build of the example + end-to-end checks in headless Chrome
 ```

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { format } from 'date-fns';
-import { getTimeOptions, isDayDisabled, toTimeValue } from '../core';
+import { getTimeOptions, isDayDisabled, isValidDate, toTimeValue } from '../core';
 import type { PickerConfig, PickerEvent, PickerState, TimeOption } from '../core';
-import { buildFieldProps, formatWith, restoreFocus, useBase, useControllable } from './shared';
+import { buildFieldProps, formatWith, restoreFocus, useBase, useControllable, useLatest } from './shared';
 import type { BasePickerProps } from './shared';
 import { useCalendar } from './useCalendar';
 import type { ButtonProps, CalendarApi, DivProps } from './useCalendar';
@@ -48,12 +48,12 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     sheetBreakpoint = 640,
     dir,
     name,
-    onOpenChange,
   } = props;
 
   const base = useBase(props);
   const [value, commit, valueRef] = useControllable(props.value, props.defaultValue ?? null, props.onChange);
   const isSheet = useSheetLayout(sheetBreakpoint);
+  const onOpenChangeRef = useLatest(props.onOpenChange);
 
   const config = useMemo<PickerConfig>(
     () => ({
@@ -93,19 +93,19 @@ export const useDatePicker = (props: UseDatePickerProps) => {
       if (!stateRef.current.open) return;
       restoreFocus(base.inputRef, popover.floatingRef.current, reason);
       send({ type: 'CLOSE' });
-      onOpenChange?.(false);
+      onOpenChangeRef.current?.(false);
     },
-    [stateRef, send, base.inputRef, popover.floatingRef, onOpenChange],
+    [stateRef, send, base.inputRef, popover.floatingRef, onOpenChangeRef],
   );
 
   const afterSelect = useCallback(
     (prev: PickerState, next: PickerState) => {
       if (prev.open && !next.open) {
         restoreFocus(base.inputRef, popover.floatingRef.current, 'select');
-        onOpenChange?.(false);
+        onOpenChangeRef.current?.(false);
       }
     },
-    [base.inputRef, popover.floatingRef, onOpenChange],
+    [base.inputRef, popover.floatingRef, onOpenChangeRef],
   );
 
   const selectDay = useCallback(
@@ -139,8 +139,8 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     setTimeTouched(false);
     focusDayOnNextRender();
     send({ type: 'SET_VALUE', value: valueRef.current }, { type: 'OPEN' });
-    onOpenChange?.(true);
-  }, [disabled, stateRef, base, focusDayOnNextRender, send, valueRef, onOpenChange]);
+    onOpenChangeRef.current?.(true);
+  }, [disabled, stateRef, base.refreshNow, focusDayOnNextRender, send, valueRef, onOpenChangeRef]);
 
   const toggle = useCallback(() => {
     if (stateRef.current.open) close('trigger');
@@ -170,10 +170,11 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     [showTime, minTime, maxTime, timeInterval, base.locale, hour12],
   );
   const selectedTime = state.selected && (timeTouched || value) ? toTimeValue(state.selected) : null;
-  const todayDisabled =
-    disabled || isDayDisabled(base.now, config) || Boolean(isDateUnavailable?.(base.now));
 
-  const inputValue = value ? formatWith(value, dateFormat, showTime ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd') : '';
+  const validValue = isValidDate(value) ? value : null;
+  const inputValue = validValue
+    ? formatWith(validValue, dateFormat, showTime ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
+    : '';
 
   const field = buildFieldProps({
     id: base.id,
@@ -181,7 +182,7 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     disabled,
     isSheet,
     labels: base.labels,
-    inputRef: base.inputRef,
+    getInputRef: base.getInputRef,
     open,
     close,
     toggle,
@@ -223,7 +224,7 @@ export const useDatePicker = (props: UseDatePickerProps) => {
     }),
     getTodayButtonProps: (): ButtonProps => ({
       type: 'button',
-      disabled: todayDisabled,
+      disabled: disabled || isDayDisabled(base.now, config) || Boolean(isDateUnavailable?.(base.now)),
       onClick: () => selectDay(base.now),
     }),
     getTimeListProps: (): DivProps => ({ role: 'listbox', 'aria-label': base.labels.time }),
@@ -241,7 +242,7 @@ export const useDatePicker = (props: UseDatePickerProps) => {
         ? {
             type: 'hidden',
             name,
-            value: value ? format(value, showTime ? "yyyy-MM-dd'T'HH:mm" : 'yyyy-MM-dd') : '',
+            value: validValue ? format(validValue, showTime ? "yyyy-MM-dd'T'HH:mm" : 'yyyy-MM-dd') : '',
           }
         : null,
   };

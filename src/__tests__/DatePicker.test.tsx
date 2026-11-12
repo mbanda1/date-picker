@@ -222,6 +222,31 @@ describe('DatePicker', () => {
     warn.mockRestore();
   });
 
+  it('treats an Invalid Date value as empty instead of throwing', async () => {
+    const { user, input, container } = setup({ value: new Date('not a date'), name: 'due', showTime: true });
+    expect(input.value).toBe('');
+    expect((container.querySelector('input[name="due"]') as HTMLInputElement).value).toBe('');
+    await user.click(input);
+    expect(dialog()).not.toBeNull();
+  });
+
+  it('does not build day cells or call isDateUnavailable while closed', async () => {
+    const isDateUnavailable = vi.fn(() => false);
+    const { user, input, rerender } = setup({ isDateUnavailable });
+    rerender(<DatePicker aria-label='Event date' now={NOW} onChange={() => {}} isDateUnavailable={isDateUnavailable} />);
+    expect(isDateUnavailable).not.toHaveBeenCalled();
+    await user.click(input);
+    expect(isDateUnavailable).toHaveBeenCalled();
+  });
+
+  it('keeps the forwarded callback ref attached across re-renders', () => {
+    const ref = vi.fn();
+    const { rerender } = render(<DatePicker ref={ref} aria-label='Due' now={NOW} />);
+    expect(ref).toHaveBeenCalledTimes(1);
+    rerender(<DatePicker ref={ref} aria-label='Due' now={NOW} placeholder='changed' />);
+    expect(ref).toHaveBeenCalledTimes(1);
+  });
+
   it('renders on the server without touching the DOM', () => {
     const html = renderToString(<DatePicker aria-label='Server' now={NOW} defaultValue={new Date(2025, 2, 10)} />);
     expect(html).toContain('value="2025-03-10"');

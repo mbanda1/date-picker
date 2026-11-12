@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type {
   ButtonHTMLAttributes,
   HTMLAttributes,
@@ -58,12 +58,12 @@ export interface CalendarPanel {
 export interface CalendarApi {
   view: CalendarView;
   nav: NavState;
-  /** Panels to render in the days view (one per visible month). */
+  /** Panels to render in the days view (one per visible month). Empty while the picker is closed. */
   panels: CalendarPanel[];
   weekdays: WeekdayName[];
-  /** Filled in the months view. */
+  /** Filled in the months view while open. */
   months: MonthItem[];
-  /** Filled in the years view. */
+  /** Filled in the years view while open. */
   years: YearItem[];
   /** Heading for the months/years view. */
   viewTitle: string;
@@ -139,43 +139,56 @@ export const useCalendar = ({
     [formatters.locale, config.weekStartsOn],
   );
 
-  const api = useMemo((): CalendarApi => {
+  const content = useMemo(() => {
     const titleId = (i: number) => `${id}-title-${i}`;
     const nav = getNavState(state, config);
-    const run = (event: PickerEvent, focus?: FocusTarget) => {
-      if (focus) pendingFocus.current = focus;
-      send(event);
-    };
+    const panelMonths = getPanelMonths(state, config);
+    const showDays = state.open && state.view === 'days';
 
-    const panels: CalendarPanel[] = getPanelMonths(state, config).map((month, index) => ({
-      index,
-      month,
-      title: formatters.monthYear(month),
-      titleId: titleId(index),
-      weeks: getDayCells(month, state, config, { fixedWeeks }).map(week =>
-        week.map(cell => ({ ...cell, label: formatters.day(cell.date) })),
-      ),
-    }));
+    const panels: CalendarPanel[] = state.open
+      ? panelMonths.map((month, index) => ({
+          index,
+          month,
+          title: formatters.monthYear(month),
+          titleId: titleId(index),
+          weeks: showDays
+            ? getDayCells(month, state, config, { fixedWeeks }).map(week =>
+                week.map(cell => ({ ...cell, label: formatters.day(cell.date) })),
+              )
+            : [],
+        }))
+      : [];
 
     const months =
-      state.view === 'months'
+      state.open && state.view === 'months'
         ? getMonthCells(state, config).map(cell => ({ ...cell, label: formatters.monthNames[cell.month] }))
         : [];
     const years =
-      state.view === 'years'
+      state.open && state.view === 'years'
         ? getYearCells(state, config).map(cell => ({
             ...cell,
             label: formatters.year(new Date(cell.year, 0, 1)),
           }))
         : [];
 
-    const viewMonth = panels[state.viewPanel]?.month ?? state.visibleMonth;
-    const viewTitle =
-      state.view === 'years'
+    const viewMonth = panelMonths[state.viewPanel] ?? state.visibleMonth;
+    const viewTitle = !state.open
+      ? ''
+      : state.view === 'years'
         ? `${formatters.year(new Date(state.yearPageStart, 0, 1))} – ${formatters.year(
             new Date(state.yearPageStart + YEAR_PAGE_SIZE - 1, 0, 1),
           )}`
         : formatters.year(viewMonth);
+
+    return { titleId, nav, panels, months, years, viewTitle };
+  }, [id, state, config, formatters, fixedWeeks]);
+
+  const api = useMemo((): CalendarApi => {
+    const { titleId, nav, panels, months, years, viewTitle } = content;
+    const run = (event: PickerEvent, focus?: FocusTarget) => {
+      if (focus) pendingFocus.current = focus;
+      send(event);
+    };
 
     const navLabels = {
       month: [labels.previousMonth, labels.nextMonth],
@@ -306,7 +319,11 @@ export const useCalendar = ({
         },
       }),
     };
-  }, [id, state, config, send, selectDay, close, formatters, labels, dir, weekdays, fixedWeeks]);
+  }, [content, state, config, send, selectDay, close, formatters, labels, dir, weekdays]);
 
-  return { api, focusDayOnNextRender: () => (pendingFocus.current = 'day') };
+  const focusDayOnNextRender = useCallback(() => {
+    pendingFocus.current = 'day';
+  }, []);
+
+  return { api, focusDayOnNextRender };
 };

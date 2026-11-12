@@ -29,7 +29,8 @@ All notable changes to `@mbanda1/date-picker` are listed here. The project follo
 
 - Bottom-sheet layout below 640px (`sheetBreakpoint`), with 44px tap targets and a one-month range picker. The page behind the sheet can't scroll while it's open.
 - Full keyboard support and screen-reader labels, following the WAI-ARIA date picker dialog pattern. Focus stays inside the open picker and returns to the input when it closes.
-- `@mbanda1/date-picker/headless`: `useDatePicker` and `useDateRangePicker` hooks for building pickers with your own markup. It also exports the framework-free core (`createInitialState`, `transition` and the calendar helpers).
+- `@mbanda1/date-picker/headless`: `useDatePicker` and `useDateRangePicker` hooks for building pickers with your own markup.
+- `@mbanda1/date-picker/core`: the framework-free state machine and calendar helpers (`createInitialState`, `transition`, `getDayCells`, …). It has no React dependency and no `'use client'` directive, so it can be used with other frameworks and in Server Components. `/headless` re-exports it too.
 - Default stylesheet with `--dp-*` CSS variables. Every rule has zero specificity, so your own styles always win. Optional dark mode via `.dark` or `[data-theme='dark']`.
 - `locale`: month names, weekday names and the first day of the week come from `Intl`.
 - `dir` and right-to-left support.

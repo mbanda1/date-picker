@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { format, isSameDay } from 'date-fns';
-import { DEFAULT_RANGE_PRESETS, isRangeSelectable } from '../core';
+import { DEFAULT_RANGE_PRESETS, isRangeSelectable, isValidDate } from '../core';
 import type { DateRange, PickerConfig, PickerEvent, PickerState, RangePreset } from '../core';
-import { buildFieldProps, formatWith, restoreFocus, useBase, useControllable } from './shared';
+import { buildFieldProps, formatWith, restoreFocus, useBase, useControllable, useLatest } from './shared';
 import type { BasePickerProps } from './shared';
 import { useCalendar } from './useCalendar';
 import type { ButtonProps, CalendarApi } from './useCalendar';
@@ -50,12 +50,12 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
     sheetBreakpoint = 640,
     dir,
     name,
-    onOpenChange,
   } = props;
 
   const base = useBase(props, RANGE_LABELS);
   const [value, commit, valueRef] = useControllable(props.value, props.defaultValue ?? EMPTY_RANGE, props.onChange);
   const isSheet = useSheetLayout(sheetBreakpoint);
+  const onOpenChangeRef = useLatest(props.onOpenChange);
 
   const config = useMemo<PickerConfig>(
     () => ({
@@ -93,9 +93,9 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
       if (!stateRef.current.open) return;
       restoreFocus(base.inputRef, popover.floatingRef.current, reason);
       send({ type: 'CLOSE' });
-      onOpenChange?.(false);
+      onOpenChangeRef.current?.(false);
     },
-    [stateRef, send, base.inputRef, popover.floatingRef, onOpenChange],
+    [stateRef, send, base.inputRef, popover.floatingRef, onOpenChangeRef],
   );
 
   const commitIfComplete = useCallback(
@@ -108,8 +108,12 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
   );
 
   const selectDay = useCallback(
-    (date: Date) => commitIfComplete(send({ type: 'SELECT_DAY', date })),
-    [send, commitIfComplete],
+    (date: Date) => {
+      const prev = stateRef.current;
+      const next = send({ type: 'SELECT_DAY', date });
+      if (next !== prev) commitIfComplete(next);
+    },
+    [stateRef, send, commitIfComplete],
   );
 
   const { api: calendar, focusDayOnNextRender } = useCalendar({
@@ -131,15 +135,16 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
     base.refreshNow();
     focusDayOnNextRender();
     send({ type: 'SET_RANGE', range: valueRef.current }, { type: 'OPEN' });
-    onOpenChange?.(true);
-  }, [disabled, stateRef, base, focusDayOnNextRender, send, valueRef, onOpenChange]);
+    onOpenChangeRef.current?.(true);
+  }, [disabled, stateRef, base.refreshNow, focusDayOnNextRender, send, valueRef, onOpenChangeRef]);
 
   const toggle = useCallback(() => {
     if (stateRef.current.open) close('trigger');
     else open();
   }, [stateRef, close, open]);
 
-  const canApply = !applyDisabled && isRangeSelectable(state, config);
+  const draftSelectable = useMemo(() => isRangeSelectable({ range: state.range }, config), [state.range, config]);
+  const canApply = !applyDisabled && draftSelectable;
 
   const apply = useCallback(() => {
     if (applyDisabled || !isRangeSelectable(stateRef.current, config)) return;
@@ -176,8 +181,10 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
   );
 
   const fmt = (date: Date) => formatWith(date, dateFormat, 'yyyy MMM d');
-  const describe = (range: DateRange) =>
-    range.start ? (range.end ? `${fmt(range.start)}${separator}${fmt(range.end)}` : fmt(range.start)) : '';
+  const describe = ({ start, end }: DateRange) => {
+    if (!isValidDate(start)) return '';
+    return isValidDate(end) ? `${fmt(start)}${separator}${fmt(end)}` : fmt(start);
+  };
 
   const field = buildFieldProps({
     id: base.id,
@@ -185,7 +192,7 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
     disabled,
     isSheet,
     labels: base.labels,
-    inputRef: base.inputRef,
+    getInputRef: base.getInputRef,
     open,
     close,
     toggle,
@@ -245,7 +252,7 @@ export const useDateRangePicker = (props: UseDateRangePickerProps) => {
             type: 'hidden',
             name,
             value:
-              value.start && value.end
+              isValidDate(value.start) && isValidDate(value.end)
                 ? `${format(value.start, 'yyyy-MM-dd')}/${format(value.end, 'yyyy-MM-dd')}`
                 : '',
           }

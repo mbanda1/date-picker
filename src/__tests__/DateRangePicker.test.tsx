@@ -85,6 +85,20 @@ describe('DateRangePicker', () => {
     expect(dialog()).toBeNull();
   });
 
+  it('autoApply ignores clicks on unavailable days instead of re-committing the range', async () => {
+    const { user, input, onChange } = setup({
+      autoApply: true,
+      defaultValue: { start: new Date(2025, 2, 3), end: new Date(2025, 2, 5) },
+      isDateUnavailable: d => d.getDay() === 0 || d.getDay() === 6,
+      maxDate: new Date(2025, 2, 20),
+    });
+    await user.click(input);
+    await user.click(day('Saturday, March 8, 2025'));
+    await user.click(day('Friday, March 28, 2025'));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(dialog()).not.toBeNull();
+  });
+
   it('applyDisabled blocks Apply', async () => {
     const { user, input } = setup({ applyDisabled: true });
     await user.click(input);
@@ -133,5 +147,30 @@ describe('DateRangePicker', () => {
       />,
     );
     expect((container.querySelector('input[name="stay"]') as HTMLInputElement).value).toBe('2025-03-01/2025-03-04');
+  });
+  it('treats Invalid Date range ends as empty instead of throwing', () => {
+    const { container } = render(
+      <DateRangePicker
+        aria-label='Stay'
+        now={NOW}
+        name='stay'
+        value={{ start: new Date('nope'), end: new Date(2025, 2, 4) }}
+      />,
+    );
+    expect((screen.getByRole('textbox', { name: 'Stay' }) as HTMLInputElement).value).toBe('');
+    expect((container.querySelector('input[name="stay"]') as HTMLInputElement).value).toBe('');
+  });
+
+  it('does not walk the range or build cells on hover-free re-renders while closed', () => {
+    const isDateUnavailable = vi.fn(() => false);
+    const value = { start: new Date(2024, 0, 1), end: new Date(2025, 0, 1) };
+    const { rerender } = render(
+      <DateRangePicker aria-label='Period' now={NOW} value={value} isDateUnavailable={isDateUnavailable} onChange={() => {}} />,
+    );
+    const callsAfterMount = isDateUnavailable.mock.calls.length;
+    rerender(
+      <DateRangePicker aria-label='Period' now={NOW} value={value} isDateUnavailable={isDateUnavailable} onChange={() => {}} />,
+    );
+    expect(isDateUnavailable).toHaveBeenCalledTimes(callsAfterMount);
   });
 });

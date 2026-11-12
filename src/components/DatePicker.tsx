@@ -20,7 +20,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(function
         <Calendar calendar={api.calendar} />
         {api.showTimeList && <TimeList api={api} />}
       </div>
-      {showTodayButton && (
+      {showTodayButton && api.isOpen && (
         <div className='dp-footer'>
           <button className='dp-button dp-today' {...api.getTodayButtonProps()}>
             {api.labels.today}

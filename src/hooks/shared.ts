@@ -7,7 +7,7 @@ import { DEFAULT_LABELS } from './labels';
 import type { PickerLabels } from './labels';
 import type { DismissReason } from './usePickerPopover';
 import type { ButtonProps, DivProps } from './useCalendar';
-import { flag, mergeRefs } from './utils';
+import { flag, useIsomorphicLayoutEffect, useMergedRef } from './utils';
 import type { DataAttributes } from './utils';
 
 export interface BasePickerProps {
@@ -56,19 +56,29 @@ export const formatWith = (date: Date, dateFormat: BasePickerProps['dateFormat']
   }
 };
 
+/** Ref that always holds the latest value, for callbacks that shouldn't change identity. */
+export const useLatest = <T>(value: T) => {
+  const ref = useRef(value);
+  useIsomorphicLayoutEffect(() => {
+    ref.current = value;
+  });
+  return ref;
+};
+
 export const useControllable = <T>(value: T | undefined, defaultValue: T, onChange?: (v: T) => void) => {
   const [internal, setInternal] = useState(defaultValue);
   const isControlled = value !== undefined;
   const current = isControlled ? value : internal;
   const currentRef = useRef(current);
   currentRef.current = current;
+  const onChangeRef = useLatest(onChange);
   const commit = useCallback(
     (next: T) => {
       currentRef.current = next;
       if (!isControlled) setInternal(next);
-      onChange?.(next);
+      onChangeRef.current?.(next);
     },
-    [isControlled, onChange],
+    [isControlled, onChangeRef],
   );
   return [current, commit, currentRef] as const;
 };
@@ -78,7 +88,8 @@ export const useBase = (props: BasePickerProps, defaultLabels?: Partial<PickerLa
   const id = props.id ?? `dp${reactId.replace(/:/g, '')}`;
   const locale = props.locale ?? DEFAULT_LOCALE;
   const formatters = useMemo(() => createFormatters(locale), [locale]);
-  const weekStartsOn = props.weekStartsOn ?? getWeekStartsOn(locale);
+  const localeWeekStart = useMemo(() => getWeekStartsOn(locale), [locale]);
+  const weekStartsOn = props.weekStartsOn ?? localeWeekStart;
   const labels = useMemo(
     () => ({ ...DEFAULT_LABELS, ...defaultLabels, ...props.labels }),
     [props.labels],
@@ -89,7 +100,8 @@ export const useBase = (props: BasePickerProps, defaultLabels?: Partial<PickerLa
     if (!props.now) setClock(new Date());
   }, [props.now]);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  return { id, locale, formatters, weekStartsOn, labels, now, refreshNow, inputRef };
+  const getInputRef = useMergedRef(inputRef);
+  return { id, locale, formatters, weekStartsOn, labels, now, refreshNow, inputRef, getInputRef };
 };
 
 interface FieldPropsOptions {
@@ -98,7 +110,7 @@ interface FieldPropsOptions {
   disabled?: boolean;
   isSheet: boolean;
   labels: PickerLabels;
-  inputRef: MutableRefObject<HTMLInputElement | null>;
+  getInputRef: (ref?: Ref<HTMLInputElement>) => Ref<HTMLInputElement>;
   open: () => void;
   close: (reason: DismissReason) => void;
   toggle: () => void;
@@ -130,7 +142,7 @@ export const buildFieldProps = (o: FieldPropsOptions) => {
       'data-disabled': flag(o.disabled),
     }),
     getInputProps: (ref?: Ref<HTMLInputElement>): InputProps => ({
-      ref: mergeRefs(o.inputRef, ref),
+      ref: o.getInputRef(ref),
       id: o.id,
       type: 'text',
       readOnly: true,
