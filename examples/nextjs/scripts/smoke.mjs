@@ -55,6 +55,7 @@ const chrome = spawn(CHROME, [
   `--remote-debugging-port=${DEBUG_PORT}`,
   '--no-first-run',
   '--no-default-browser-check',
+  ...(process.env.CI ? ['--no-sandbox'] : []),
   `--user-data-dir=${await mkdtemp(join(tmpdir(), 'dp-smoke-'))}`,
   'about:blank',
 ]);

@@ -353,6 +353,8 @@ pnpm example:smoke  # production build of the example + end-to-end checks in hea
 
 `example:smoke` uses the published entry points (`dist`, the `exports` map and `styles.css`), so it checks exactly what consumers install. It needs Chrome or Chromium; set `CHROME_PATH` if Chrome isn't in a standard location. It fails on any broken flow and on any console error or warning, including hydration warnings. Screenshots go to `examples/nextjs/.smoke/`.
 
+CI ([.github/workflows/ci.yml](./.github/workflows/ci.yml)) runs on every pull request and every push to `main`. One job typechecks, runs the tests (also in three timezones with DST changes or unusual offsets), builds, and checks the package contents. A second job runs `example:smoke` in Chrome and uploads the screenshots.
+
 ## License
 
 MIT © mbanda1
