@@ -58,7 +58,15 @@ const chrome = spawn(CHROME, [
   ...(process.env.CI ? ['--no-sandbox'] : []),
   `--user-data-dir=${await mkdtemp(join(tmpdir(), 'dp-smoke-'))}`,
   'about:blank',
-]);
+], { stdio: ['ignore', 'ignore', 'pipe'] });
+let chromeLog = '';
+chrome.stderr.on('data', chunk => {
+  chromeLog = (chromeLog + chunk).slice(-4000);
+});
+let chromeExit = null;
+chrome.on('exit', code => {
+  chromeExit = code;
+});
 
 let ws;
 let nextId = 1;
@@ -135,16 +143,23 @@ const check = async (label, fn) => {
 
 try {
   let target;
-  for (let i = 0; i < 50 && !target; i++) {
+  const deadline = Date.now() + 15_000;
+  while (!target && chromeExit === null && Date.now() < deadline) {
     try {
       const list = await (await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/list`)).json();
       target = list.find(t => t.type === 'page');
-    } catch {
-      await sleep(100);
-    }
+    } catch {}
+    if (!target) await sleep(200);
+  }
+  if (!target) {
+    const why = chromeExit === null ? 'did not open a page within 15s' : `exited with code ${chromeExit}`;
+    throw new Error(`Chrome ${why} (${CHROME}).\nChrome stderr:\n${chromeLog || '(empty)'}`);
   }
   ws = new WebSocket(target.webSocketDebuggerUrl);
-  await new Promise(resolve => ws.addEventListener('open', resolve));
+  await new Promise((resolve, reject) => {
+    ws.addEventListener('open', resolve);
+    ws.addEventListener('error', () => reject(new Error(`Could not connect to ${target.webSocketDebuggerUrl}`)));
+  });
   ws.addEventListener('message', ({ data }) => {
     const msg = JSON.parse(data);
     if (msg.id && pending.has(msg.id)) {
