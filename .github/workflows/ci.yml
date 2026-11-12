@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  library:
+    name: Typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Test in timezones with DST and large offsets
+        run: |
+          for tz in America/Santiago Pacific/Auckland Asia/Kolkata; do
+            echo "TZ=$tz"
+            TZ=$tz pnpm test
+          done
+      - run: pnpm build
+      - name: Check package contents
+        run: npm pack --dry-run
+
+  smoke:
+    name: Next.js example smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build library and example, run smoke test in Chrome
+        run: pnpm example:smoke
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: examples/nextjs/.smoke/*.png
+          if-no-files-found: ignore
