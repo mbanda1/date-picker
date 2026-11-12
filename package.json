@@ -1,6 +1,6 @@
 {
   "name": "@mbanda1/date-picker",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Headless-first, accessible React date and date-range pickers",
   "repository": {
     "type": "git",
@@ -49,7 +49,16 @@
     "example:dev": "pnpm build && pnpm --filter date-picker-example-nextjs dev",
     "example:smoke": "pnpm build && pnpm --filter date-picker-example-nextjs build && pnpm --filter date-picker-example-nextjs smoke"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "nextjs",
+    "date-picker",
+    "date-range-picker",
+    "datepicker",
+    "calendar",
+    "headless",
+    "accessible"
+  ],
   "packageManager": "pnpm@10.15.1",
   "peerDependencies": {
     "date-fns": "^3.0.0 || ^4.0.0",

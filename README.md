@@ -37,6 +37,8 @@ import '@mbanda1/date-picker/styles.css';
 ![Single date picker with time selection](./docs/single-picker.png)
 
 ```tsx
+'use client';
+
 import { useState } from 'react';
 import { DatePicker } from '@mbanda1/date-picker';
 
@@ -64,6 +66,8 @@ export function EventDateField() {
 ### Date range
 
 ```tsx
+'use client';
+
 import { useState } from 'react';
 import { DateRangePicker, type DateRange } from '@mbanda1/date-picker';
 
@@ -81,6 +85,8 @@ export function ReportFilter() {
 The components forward `ref`, `onBlur` and `name`, so `Controller` works without a wrapper. RHF can focus the field on a validation error and mark it as touched.
 
 ```tsx
+'use client';
+
 import { Controller, useForm } from 'react-hook-form';
 import { DatePicker, DateRangePicker, type DateRange } from '@mbanda1/date-picker';
 
@@ -166,19 +172,27 @@ All rules have zero specificity (`:where()`), so your own CSS always wins. Most 
 | `--dp-radius` / `--dp-day-radius` | `8px` | Corner radius |
 | `--dp-cell-size` / `--dp-field-height` | `2.5rem` (sheet: `2.75rem`) / `2.5rem` | Day size, input height |
 | `--dp-font` / `--dp-font-size` | `inherit` / `0.875rem` | Typography |
-| `--dp-shadow` / `--dp-backdrop` / `--dp-z-index` | | Popover shadow, sheet backdrop, stacking |
+| `--dp-shadow` / `--dp-backdrop` / `--dp-z-index` | Soft shadow / translucent navy / `1000` | Popover shadow, sheet backdrop, stacking |
 
 The default colours meet WCAG AA contrast. For **dark mode**, add `.dark` or `[data-theme="dark"]` to an ancestor (the conventions used by `next-themes` and Tailwind). You can override the dark values with the same variables inside your own dark selector.
 
 ![Dark theme](./docs/range-picker-dark.png)
 
-To style elements directly, use the `dp-*` classes (`.dp-day`, `.dp-cell`, `.dp-title`, …) together with state attributes: `data-selected`, `data-today`, `data-in-range`, `data-range-start`, `data-range-end`, `data-preview`, `data-disabled`, `data-unavailable`, `data-outside-month`, `data-open`, `data-layout="popover|sheet"`.
+To style elements directly, use the `dp-*` classes (`.dp-day`, `.dp-cell`, `.dp-title`, …) together with state attributes:
+
+- Days: `data-selected`, `data-today`, `data-in-range`, `data-range-start`, `data-range-end`, `data-preview`, `data-disabled`, `data-unavailable`, `data-outside-month`.
+- Months and years: `data-selected`, `data-current` (this month or year), `data-disabled`.
+- Presets: `data-active`.
+- Field: `data-open`, `data-disabled`.
+- Popover: `data-layout="popover|sheet"`, `data-view="days|months|years"`.
 
 ## Headless hooks
 
 Using Tailwind, MUI, shadcn or your own design system? Use `@mbanda1/date-picker/headless`. You get the same behaviour, keyboard model and ARIA, and you render all the markup yourself. Every prop getter returns the right attributes and handlers to spread onto your element.
 
 ```tsx
+'use client';
+
 import { useDatePicker } from '@mbanda1/date-picker/headless';
 
 export function TailwindDatePicker(props: { value: Date | null; onChange: (d: Date | null) => void }) {
@@ -232,6 +246,8 @@ export function TailwindDatePicker(props: { value: Date | null; onChange: (d: Da
 }
 ```
 
+Below `sheetBreakpoint` (640px by default), `getDialogProps()` returns no positioning `style`, sets `data-layout="sheet"` and `aria-modal`, and the hook locks page scrolling while the picker is open. Style that state as a bottom sheet, for example with `data-[layout=sheet]:fixed data-[layout=sheet]:inset-x-0 data-[layout=sheet]:bottom-0`, or pass `sheetBreakpoint={null}` to always get a positioned popover. `picker.isSheet` tells you which layout is active.
+
 The same entry point exports the framework-free core (`createInitialState`, `transition`, `getDayCells`, `getTimeOptions`, `DEFAULT_RANGE_PRESETS`, …). It's plain TypeScript with no React, for teams building on another framework.
 
 ## Keyboard
@@ -239,12 +255,14 @@ The same entry point exports the framework-free core (`createInitialState`, `tra
 | Key | Action |
 | --- | --- |
 | `Enter`, `Space`, `↓` on the input | Open the picker and focus the selected day |
-| `←` `→` `↑` `↓` | Previous or next day / week (left and right swap with `dir="rtl"`) |
+| `←` `→` `↑` `↓` | Previous or next day / week (left and right swap in right-to-left layouts) |
 | `PageUp` / `PageDown` | Previous or next month (with `Shift`: year) |
 | `Home` / `End` | First or last day of the week |
 | `Enter` / `Space` | Pick the focused day |
 | `Tab` | Move between controls (kept inside the popover) |
 | `Esc` | Close and return focus to the input |
+
+The arrow, Page and Home/End keys work in the days grid. In the month and year views, use `Tab` and `Enter`.
 
 ## API
 
@@ -255,18 +273,19 @@ The same entry point exports the framework-free core (`createInitialState`, `tra
 | `minDate` / `maxDate` | `Date` | | Inclusive bounds. Navigation and selection stop at them. |
 | `isDateUnavailable` | `(date: Date) => boolean` | | Mark extra days as unavailable (weekends, holidays). |
 | `disabled` | `boolean` | `false` | |
-| `invalid` / `required` | `boolean` | `false` | Sets `aria-invalid` / `aria-required` and the error style. |
+| `invalid` | `boolean` | `false` | Sets `aria-invalid` and the error style. |
+| `required` | `boolean` | `false` | Sets `aria-required` only. It doesn't stop a form from submitting, so validate in your form code (for example RHF `rules`). |
 | `locale` | `string` | `'en-US'` | BCP 47 locale for month and weekday names and time labels. |
 | `weekStartsOn` | `0`–`6` | From `locale` | First day of the week (0 = Sunday). |
 | `dateFormat` | `string \| (date) => string` | See each component | `date-fns` format string or formatter for the input text. An invalid format string falls back to the default and logs a warning. |
-| `placeholder` | `string` | | |
+| `placeholder` | `string` | `'Select date'` / `'Select date range'` | |
 | `clearable` | `boolean` | `true` | Show a clear button when there is a value. |
 | `defaultMonth` | `Date` | Today | Month to show when nothing is selected. |
 | `fixedWeeks` | `boolean` | `false` | Always render 6 weeks so the height never changes. |
 | `sheetBreakpoint` | `number \| null` | `640` | Viewport width (px) below which the bottom sheet is used. |
 | `labels` | `Partial<PickerLabels>` | English | Translate button and dialog labels. |
 | `now` | `Date` | `new Date()` | Fixed current time (for server rendering and tests). |
-| `dir` | `'ltr' \| 'rtl'` | `'ltr'` | Flips horizontal arrow keys. |
+| `dir` | `'ltr' \| 'rtl'` | Inherited from the page | Text direction of the popover and the arrow keys. Set it when only part of the page is right-to-left, because the popover renders in `<body>`. |
 | `name` | `string` | | Adds a hidden input with an ISO value. |
 | `id`, `aria-label`, `aria-labelledby`, `aria-describedby`, `onBlur` | | | Passed to the input. |
 | `className` / `popoverClassName` | `string` | | Classes for the field wrapper and the popover. |
@@ -280,7 +299,7 @@ The same entry point exports the framework-free core (`createInitialState`, `tra
 | `value` / `defaultValue` | `Date \| null` | | Controlled or uncontrolled value. |
 | `onChange` | `(date: Date \| null) => void` | | |
 | `dateFormat` | | `'yyyy-MM-dd'` (`'yyyy-MM-dd HH:mm'` with time) | |
-| `showTime` | `boolean` | `false` | Show a time list. `onChange` fires once a time is chosen. |
+| `showTime` | `boolean` | `false` | Show a time list after a day is picked. An empty field calls `onChange` once a time is chosen. When there is already a value, picking another day keeps its time and calls `onChange` straight away. The picker stays open until the user closes it. |
 | `timeInterval` | `number` | `30` | Minutes between time options. |
 | `minTime` / `maxTime` | `'HH:mm'` | `'00:00'` / `'23:59'` | |
 | `hour12` | `boolean` | From `locale` | Force 12- or 24-hour labels. |
@@ -300,11 +319,11 @@ The same entry point exports the framework-free core (`createInitialState`, `tra
 | `autoApply` | `boolean` | `false` | Commit and close as soon as both ends are picked. |
 | `applyDisabled` | `boolean` | `false` | Disable Apply, e.g. while saving. |
 
-A custom preset:
+A custom preset. `getRange` receives the current time and `{ weekStartsOn }`, and the returned ends are widened to whole days:
 
-```ts
+```tsx
 import { startOfQuarter, endOfQuarter } from 'date-fns';
-import { DEFAULT_RANGE_PRESETS, type RangePreset } from '@mbanda1/date-picker';
+import { DateRangePicker, DEFAULT_RANGE_PRESETS, type RangePreset } from '@mbanda1/date-picker';
 
 const thisQuarter: RangePreset = {
   id: 'this-quarter',
@@ -318,6 +337,10 @@ const thisQuarter: RangePreset = {
 ## Migrating from 0.x
 
 0.x depended on Chakra UI. 1.0 has no UI framework dependency, so remove `@chakra-ui/react`, `@emotion/*` and `framer-motion` if nothing else in your app uses them, and import `@mbanda1/date-picker/styles.css`.
+
+`date-fns` is now a peer dependency instead of being bundled, so add `date-fns` 3 or 4 to your app. React 17 is no longer supported.
+
+The full list of changes is in [CHANGELOG.md](./CHANGELOG.md).
 
 | 0.x | 1.0 |
 | --- | --- |
@@ -347,7 +370,7 @@ pnpm install
 pnpm test           # vitest: core logic + jsdom component tests
 pnpm typecheck
 pnpm build          # dist/: index, headless, styles.css
-pnpm example:dev    # Next.js playground at http://localhost:3000
+pnpm example:dev    # Next.js examples at http://localhost:3000, props playground at /playground
 pnpm example:smoke  # production build of the example + end-to-end checks in headless Chrome
 ```
 
