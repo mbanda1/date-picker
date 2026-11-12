@@ -39,8 +39,22 @@ export interface BasePickerProps {
 
 export type InputProps = InputHTMLAttributes<HTMLInputElement> & DataAttributes & { ref?: Ref<HTMLInputElement> };
 
-export const formatWith = (date: Date, dateFormat: BasePickerProps['dateFormat'], fallback: string) =>
-  typeof dateFormat === 'function' ? dateFormat(date) : format(date, dateFormat ?? fallback);
+const warnedFormats = new Set<string>();
+
+export const formatWith = (date: Date, dateFormat: BasePickerProps['dateFormat'], fallback: string) => {
+  if (typeof dateFormat === 'function') return dateFormat(date);
+  if (dateFormat === undefined) return format(date, fallback);
+  try {
+    return format(date, dateFormat);
+  } catch (error) {
+    if (!(error instanceof RangeError) || Number.isNaN(date.getTime())) throw error;
+    if (!warnedFormats.has(dateFormat)) {
+      warnedFormats.add(dateFormat);
+      console.warn(`[date-picker] Invalid dateFormat "${dateFormat}", using "${fallback}". ${error.message}`);
+    }
+    return format(date, fallback);
+  }
+};
 
 export const useControllable = <T>(value: T | undefined, defaultValue: T, onChange?: (v: T) => void) => {
   const [internal, setInternal] = useState(defaultValue);

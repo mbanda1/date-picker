@@ -212,6 +212,16 @@ describe('DatePicker', () => {
     expect(headers[0]).toBe('lundi');
   });
 
+  it('falls back to the default format and warns once when dateFormat is invalid', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { input, rerender } = setup({ defaultValue: new Date(2025, 2, 10), dateFormat: 'yyyy-MM-dd j' });
+    expect(input.value).toBe('2025-03-10');
+    rerender(<DatePicker aria-label='Event date' now={NOW} defaultValue={new Date(2025, 2, 10)} dateFormat='yyyy-MM-dd j' />);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('"yyyy-MM-dd j"');
+    warn.mockRestore();
+  });
+
   it('renders on the server without touching the DOM', () => {
     const html = renderToString(<DatePicker aria-label='Server' now={NOW} defaultValue={new Date(2025, 2, 10)} />);
     expect(html).toContain('value="2025-03-10"');

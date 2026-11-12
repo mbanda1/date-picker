@@ -258,7 +258,7 @@ The same entry point exports the framework-free core (`createInitialState`, `tra
 | `invalid` / `required` | `boolean` | `false` | Sets `aria-invalid` / `aria-required` and the error style. |
 | `locale` | `string` | `'en-US'` | BCP 47 locale for month and weekday names and time labels. |
 | `weekStartsOn` | `0`–`6` | From `locale` | First day of the week (0 = Sunday). |
-| `dateFormat` | `string \| (date) => string` | See each component | `date-fns` format string or formatter for the input text. |
+| `dateFormat` | `string \| (date) => string` | See each component | `date-fns` format string or formatter for the input text. An invalid format string falls back to the default and logs a warning. |
 | `placeholder` | `string` | | |
 | `clearable` | `boolean` | `true` | Show a clear button when there is a value. |
 | `defaultMonth` | `Date` | Today | Month to show when nothing is selected. |
